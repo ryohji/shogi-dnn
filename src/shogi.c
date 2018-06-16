@@ -71,14 +71,37 @@ static const char* _str_cell(enum cell cell) {
 
 char* board_tostring(const struct board* b) {
     char buffer[1024];
+    int hand[14] = {0};
     char *p = buffer;
     int i;
-    p += sprintf(p, "W:c-0 a-0 7-0 5-0 3-0 1-00\n");
-    while (i < NUMBER_OF_CELLS) {
-        p += sprintf(p, "%s%c", _str_cell(b->cell[i]), (i % 9 != 8 ? ' ' : '\n'));
-        ++i;
+    for (i = 0; i < NUMBER_OF_HANDS; ++i) {
+        switch (b->hand[i]) {
+        case CELL_W_FU: hand[0] += 1; break;
+        case CELL_W_KYO: hand[1] += 1; break;
+        case CELL_W_KEI: hand[2] += 1; break;
+        case CELL_W_GIN: hand[3] += 1; break;
+        case CELL_W_KIN: hand[4] += 1; break;
+        case CELL_W_KAKU: hand[5] += 1; break;
+        case CELL_W_HISHA: hand[6] += 1; break;
+        case CELL_B_FU: hand[7] += 1; break;
+        case CELL_B_KYO: hand[8] += 1; break;
+        case CELL_B_KEI: hand[9] += 1; break;
+        case CELL_B_GIN: hand[10] += 1; break;
+        case CELL_B_KIN: hand[11] += 1; break;
+        case CELL_B_KAKU: hand[12] += 1; break;
+        case CELL_B_HISHA: hand[13] += 1; break;
+        default: break;
+        }
     }
-    p += sprintf(p, "B:c-0 a-0 7-0 5-0 3-0 1-00");
+    p += sprintf(p, "c-%d a-%d 9-%d 7-%d 5-%d 3-%d 1-%02d\n",
+        hand[6], hand[5], hand[4], hand[3], hand[2], hand[1], hand[0]);
+    for (i = 0; i < NUMBER_OF_CELLS; ++i) {
+        const char *const padding = i % 9 == 0 ? " " : "";
+        const char separator = i % 9 != 8 ? ' ' : '\n';
+        p += sprintf(p, "%s%s%c", padding, _str_cell(b->cell[i]), separator);
+    }
+    p += sprintf(p, "c-%d a-%d 9-%d 7-%d 5-%d 3-%d 1-%02d",
+        hand[13], hand[12], hand[11], hand[10], hand[9], hand[8], hand[7]);
     return strdup(buffer);
 }
 
