@@ -1,9 +1,9 @@
+#include "shogi.h"
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "shogi.h"
 
 #define NUMBER_OF_CELLS 81
 #define NUMBER_OF_HANDS 38
