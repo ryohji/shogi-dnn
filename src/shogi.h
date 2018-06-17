@@ -1,6 +1,7 @@
 #ifndef SHOGI_H_
 #define SHOGI_H_
 
+#define NUMBER_OF_KOMA 14
 enum koma {
     K_FU, /* fuhyo */
     K_TO, /* promoted fuhyo */
@@ -18,6 +19,7 @@ enum koma {
     K_GYOKU, /* gyokusho */
 };
 
+#define NUMBER_OF_MOVES 17
 enum move {
     M_AGARU, /* go straight forward */
     M_NARU, /* go forward and promote */
@@ -37,6 +39,9 @@ enum move {
     M_HIKI_NARU, /* back and promote */
     M_UTSU, /* put piece from hand */
 };
+
+#define NUMBER_OF_COLUMNS 9
+#define NUMBER_OF_ROWS 9
 
 /**
  * States of Shogi cell.
