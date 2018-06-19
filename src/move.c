@@ -81,6 +81,46 @@ static unsigned remove_improper_promotion(const void *elem, void *context) {
     || move.move == M_MIGI_HIKI_NARU || move.move == M_HIDARI_HIKI_NARU || move.move == M_HIKI_NARU);
 }
 
+static unsigned remove_forbidden_move(const void *elem, void *context) {
+    const struct move_detail move = move_detail(*(uint16_t *)elem);
+    switch (move.koma) {
+    case K_FU:
+    case K_KYOU:
+        return move.move != M_AGARU && move.move != M_NARU;
+    case K_KEI:
+        return move.move != M_MIGI && move.move != M_MIGI_NARU
+        && move.move != M_HIDARI && move.move != M_HIDARI_NARU;
+    case K_GIN:
+        return move.move != M_AGARU && move.move != M_NARU
+        && move.move != M_MIGI && move.move != M_MIGI_NARU
+        && move.move != M_HIDARI && move.move != M_HIDARI_NARU
+        && move.move != M_MIGI_HIKU && move.move != M_MIGI_HIKI_NARU
+        && move.move != M_HIDARI_HIKU && move.move != M_HIDARI_HIKI_NARU;
+    case K_KIN:
+    case K_TO:
+    case K_NARIKYOU:
+    case K_NARIKEI:
+        return move.move != M_AGARU
+        && move.move != M_MIGI
+        && move.move != M_HIDARI
+        && move.move != M_MIGI_YORU
+        && move.move != M_HIDARI_YORU
+        && move.move != M_HIKU;
+    case K_KAKU:
+        return move.move != M_MIGI && move.move != M_MIGI_NARU
+        && move.move != M_HIDARI && move.move != M_HIDARI_NARU
+        && move.move != M_MIGI_HIKU && move.move != M_MIGI_HIKI_NARU
+        && move.move != M_HIDARI_HIKU && move.move != M_HIDARI_HIKI_NARU;
+    case K_HISYA:
+        return move.move != M_AGARU && move.move != M_NARU
+        && move.move != M_MIGI_YORU && move.move != M_MIGI_YORI_NARU
+        && move.move != M_HIDARI_YORU && move.move != M_HIDARI_YORI_NARU
+        && move.move != M_HIKU && move.move != M_HIKI_NARU;
+    default:
+        return 0;
+    }
+}
+
 int main() {
     const unsigned int N = NUMBER_OF_COLUMNS * NUMBER_OF_ROWS * NUMBER_OF_KOMA * NUMBER_OF_MOVES;
     uint16_t *const all_moves = malloc(sizeof(uint16_t) * N);
@@ -92,12 +132,17 @@ int main() {
     }
 
     end = filter(all_moves, end, sizeof(uint16_t), remove_improper_promotion, NULL, all_moves);
+    end = filter(all_moves, end, sizeof(uint16_t), remove_forbidden_move, NULL, all_moves);
+    /* TODO remove moves from outside */
+    /* TODO remove moves enables no more move */
+    /* TODO remove moves gyoku uchi */
+
+    /* dump result */
     for (it = all_moves; it != end; ++it) {
         const intptr_t i = it - all_moves;
         struct move_detail move = move_detail(*it);
 
         printf("[%5ld] %d %d %s %s\n", i, move.suji + 1, move.dan + 1, _str_koma(move.koma), _str_move(move.move));
-        if (i == 4096) break;
     }
     free(all_moves);
     return 0;
