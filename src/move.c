@@ -73,14 +73,17 @@ static const char* _str_move(unsigned move) {
 int main() {
     const unsigned int N = NUMBER_OF_COLUMNS * NUMBER_OF_ROWS * NUMBER_OF_KOMA * NUMBER_OF_MOVES;
     uint16_t *const all_moves = malloc(sizeof(uint16_t) * N);
-    int i;
-    for (i = 0; i < N; ++i) {
+
+    uint16_t *it, *end;
+    end = all_moves + N;
+    for (it = all_moves; it != end; ++it) {
+        const intptr_t i = it - all_moves;
         struct move_detail move = move_detail(i);
 
-        printf("[%5d] %d %d %s %s\n", i, move.suji + 1, move.dan + 1, _str_koma(move.koma), _str_move(move.move));
+        printf("[%5ld] %d %d %s %s\n", i, move.suji + 1, move.dan + 1, _str_koma(move.koma), _str_move(move.move));
         if (i == 4096) break;
 
-        all_moves[i] = i;
+        *it = i;
     }
     free(all_moves);
     return 0;
