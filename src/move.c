@@ -121,6 +121,30 @@ static unsigned remove_forbidden_move(const void *elem, void *context) {
     }
 }
 
+static unsigned remove_enter_outside(const void *elem, void *context) {
+    const struct move_detail move = move_detail(*(uint16_t *)elem);
+    unsigned result = 0;
+    if (move.dan == 0) {
+        result |= move.move == M_MIGI_HIKU || move.move == M_MIGI_HIKI_NARU
+        || move.move == M_HIDARI_HIKU || move.move == M_HIDARI_HIKI_NARU
+        || move.move == M_HIKU || move.move == M_HIKI_NARU;
+    } else if (move.dan == 8) {
+        result |= move.move == M_AGARU || move.move == M_NARU
+        || move.move == M_MIGI || move.move == M_MIGI_NARU
+        || move.move == M_HIDARI || move.move == M_HIDARI_NARU;
+    }
+    if (move.suji == 0) {
+        result |= move.move == M_MIGI || move.move == M_MIGI_NARU
+        || move.move == M_MIGI_YORU || move.move == M_MIGI_YORI_NARU
+        || move.move == M_MIGI_HIKU || move.move == M_MIGI_HIKI_NARU;
+    } else if (move.suji == 8) {
+        result |= move.move == M_HIDARI || move.move == M_HIDARI_NARU
+        || move.move == M_HIDARI_YORU || move.move == M_HIDARI_YORI_NARU
+        || move.move == M_HIDARI_HIKU || move.move == M_HIDARI_HIKI_NARU;
+    }
+    return result;
+}
+
 static unsigned remove_enables_no_more_move(const void *elem, void *context) {
     const struct move_detail move = move_detail(*(uint16_t *)elem);
     switch (move.koma) {
@@ -151,7 +175,7 @@ int main() {
 
     end = filter(all_moves, end, sizeof(uint16_t), remove_improper_promotion, NULL, all_moves);
     end = filter(all_moves, end, sizeof(uint16_t), remove_forbidden_move, NULL, all_moves);
-    /* TODO remove moves from outside */
+    end = filter(all_moves, end, sizeof(uint16_t), remove_enter_outside, NULL, all_moves);
     end = filter(all_moves, end, sizeof(uint16_t), remove_enables_no_more_move, NULL, all_moves);
     end = filter(all_moves, end, sizeof(uint16_t), remove_gyoku_utsu, NULL, all_moves);
 
