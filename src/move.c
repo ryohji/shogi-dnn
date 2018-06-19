@@ -27,6 +27,8 @@ struct move_detail move_detail(unsigned move) {
 #ifdef UNITTEST_
 #include <stdio.h>
 
+#include "filter.h"
+
 static const char* _str_koma(unsigned koma) {
     switch (koma) {
     case 0: return "FU";
@@ -70,6 +72,15 @@ static const char* _str_move(unsigned move) {
     }
 }
 
+static unsigned remove_improper_promotion(const void *elem, void *context) {
+    const struct move_detail move = move_detail(*(uint16_t *)elem);
+    return (move.dan > 2 || move.koma == K_TO || move.koma == K_NARIKYOU || move.koma == K_NARIKEI
+    || move.koma == K_NARIGIN || move.koma == K_UMA || move.koma == K_RYU || move.koma == K_GYOKU)
+    && (move.move == M_NARU || move.move == M_MIGI_NARU || move.move == M_HIDARI_NARU
+    || move.move == M_MIGI_YORI_NARU || move.move == M_HIDARI_YORI_NARU
+    || move.move == M_MIGI_HIKI_NARU || move.move == M_HIDARI_HIKI_NARU || move.move == M_HIKI_NARU);
+}
+
 int main() {
     const unsigned int N = NUMBER_OF_COLUMNS * NUMBER_OF_ROWS * NUMBER_OF_KOMA * NUMBER_OF_MOVES;
     uint16_t *const all_moves = malloc(sizeof(uint16_t) * N);
@@ -77,13 +88,16 @@ int main() {
     uint16_t *it, *end;
     end = all_moves + N;
     for (it = all_moves; it != end; ++it) {
+        *it = it - all_moves;
+    }
+
+    end = filter(all_moves, end, sizeof(uint16_t), remove_improper_promotion, NULL, all_moves);
+    for (it = all_moves; it != end; ++it) {
         const intptr_t i = it - all_moves;
-        struct move_detail move = move_detail(i);
+        struct move_detail move = move_detail(*it);
 
         printf("[%5ld] %d %d %s %s\n", i, move.suji + 1, move.dan + 1, _str_koma(move.koma), _str_move(move.move));
         if (i == 4096) break;
-
-        *it = i;
     }
     free(all_moves);
     return 0;
