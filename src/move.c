@@ -3,6 +3,27 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+struct move_detail {
+    int8_t dan;
+    int8_t suji;
+    enum koma koma;
+    enum move move;
+};
+
+struct move_detail move_detail(unsigned move) {
+    struct move_detail result;
+    div_t d = {move};
+    d = div(d.quot, NUMBER_OF_MOVES);
+    result.move = d.rem;
+    d = div(d.quot, NUMBER_OF_ROWS);
+    result.dan = d.rem;
+    d = div(d.quot, NUMBER_OF_COLUMNS);
+    result.suji = d.rem;
+    d = div(d.quot, NUMBER_OF_KOMA);
+    result.koma = d.rem;
+    return result;
+}
+
 #ifdef UNITTEST_
 #include <stdio.h>
 
@@ -54,18 +75,9 @@ int main() {
     uint16_t *const all_moves = malloc(sizeof(uint16_t) * N);
     int i;
     for (i = 0; i < N; ++i) {
-        div_t d = {i};
-        unsigned suji, dan, koma, move;
-        d = div(d.quot, NUMBER_OF_MOVES);
-        move = d.rem;
-        d = div(d.quot, NUMBER_OF_ROWS);
-        dan = d.rem;
-        d = div(d.quot, NUMBER_OF_COLUMNS);
-        suji = d.rem;
-        d = div(d.quot, NUMBER_OF_KOMA);
-        koma = d.rem;
+        struct move_detail move = move_detail(i);
 
-        printf("[%5d] %d %d %s %s\n", i, suji, dan, _str_koma(koma), _str_move(move));
+        printf("[%5d] %d %d %s %s\n", i, move.suji + 1, move.dan + 1, _str_koma(move.koma), _str_move(move.move));
         if (i == 4096) break;
 
         all_moves[i] = i;
