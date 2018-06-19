@@ -121,6 +121,11 @@ static unsigned remove_forbidden_move(const void *elem, void *context) {
     }
 }
 
+static unsigned remove_gyoku_utsu(const void *elem, void *context) {
+    const struct move_detail move = move_detail(*(uint16_t *)elem);
+    return move.koma == K_GYOKU && move.move == M_UTSU;
+}
+
 int main() {
     const unsigned int N = NUMBER_OF_COLUMNS * NUMBER_OF_ROWS * NUMBER_OF_KOMA * NUMBER_OF_MOVES;
     uint16_t *const all_moves = malloc(sizeof(uint16_t) * N);
@@ -135,7 +140,7 @@ int main() {
     end = filter(all_moves, end, sizeof(uint16_t), remove_forbidden_move, NULL, all_moves);
     /* TODO remove moves from outside */
     /* TODO remove moves enables no more move */
-    /* TODO remove moves gyoku uchi */
+    end = filter(all_moves, end, sizeof(uint16_t), remove_gyoku_utsu, NULL, all_moves);
 
     /* dump result */
     for (it = all_moves; it != end; ++it) {
