@@ -121,6 +121,19 @@ static unsigned remove_forbidden_move(const void *elem, void *context) {
     }
 }
 
+static unsigned remove_enables_no_more_move(const void *elem, void *context) {
+    const struct move_detail move = move_detail(*(uint16_t *)elem);
+    switch (move.koma) {
+    case K_FU:
+    case K_KYOU:
+        return move.dan == 0 && (move.move == M_AGARU || move.move == M_UTSU);
+    case K_KEI:
+        return (move.dan == 0 || move.dan == 1) && (move.move == M_MIGI || move.move == M_HIDARI || move.move == M_UTSU);
+    default:
+        return 0;
+    }
+}
+
 static unsigned remove_gyoku_utsu(const void *elem, void *context) {
     const struct move_detail move = move_detail(*(uint16_t *)elem);
     return move.koma == K_GYOKU && move.move == M_UTSU;
@@ -139,7 +152,7 @@ int main() {
     end = filter(all_moves, end, sizeof(uint16_t), remove_improper_promotion, NULL, all_moves);
     end = filter(all_moves, end, sizeof(uint16_t), remove_forbidden_move, NULL, all_moves);
     /* TODO remove moves from outside */
-    /* TODO remove moves enables no more move */
+    end = filter(all_moves, end, sizeof(uint16_t), remove_enables_no_more_move, NULL, all_moves);
     end = filter(all_moves, end, sizeof(uint16_t), remove_gyoku_utsu, NULL, all_moves);
 
     /* dump result */
