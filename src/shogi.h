@@ -14,7 +14,7 @@ enum koma {
     K_KIN, /* kinsho */
     K_KAKU, /* kakugyo */
     K_UMA, /* promoted kakugyo */
-    K_HISYA, /* hisha */
+    K_HISHA, /* hisha */
     K_RYU, /* promoted hisha */
     K_GYOKU, /* gyokusho */
 };

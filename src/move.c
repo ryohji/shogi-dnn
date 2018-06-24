@@ -34,16 +34,16 @@ static const char* _str_koma(unsigned koma) {
     case 0: return "FU";
     case 1: return "TO";
     case 2: return "KYOU";
-    case 3: return "NARI-KYOU";
+    case 3: return "NARIKYOU";
     case 4: return "KEI";
-    case 5: return "NARI-KEI";
+    case 5: return "NARIKEI";
     case 6: return "GIN";
-    case 7: return "NARI-GIN";
+    case 7: return "NARIGIN";
     case 8: return "KIN";
     case 9: return "KAKU";
-    case 10: return "NARI-KAKU";
+    case 10: return "UMA";
     case 11: return "HISHA";
-    case 12: return "NARI-HISHA";
+    case 12: return "RYU";
     case 13: return "GYOKU";
     default: return "";
     }
@@ -86,38 +86,47 @@ static unsigned remove_forbidden_move(const void *elem, void *context) {
     switch (move.koma) {
     case K_FU:
     case K_KYOU:
-        return move.move != M_AGARU && move.move != M_NARU;
+        return move.move != M_AGARU && move.move != M_NARU
+        && move.move != M_UTSU;
     case K_KEI:
         return move.move != M_MIGI && move.move != M_MIGI_NARU
-        && move.move != M_HIDARI && move.move != M_HIDARI_NARU;
+        && move.move != M_HIDARI && move.move != M_HIDARI_NARU
+        && move.move != M_UTSU;
     case K_GIN:
         return move.move != M_AGARU && move.move != M_NARU
         && move.move != M_MIGI && move.move != M_MIGI_NARU
         && move.move != M_HIDARI && move.move != M_HIDARI_NARU
         && move.move != M_MIGI_HIKU && move.move != M_MIGI_HIKI_NARU
-        && move.move != M_HIDARI_HIKU && move.move != M_HIDARI_HIKI_NARU;
+        && move.move != M_HIDARI_HIKU && move.move != M_HIDARI_HIKI_NARU
+        && move.move != M_UTSU;
     case K_KIN:
     case K_TO:
     case K_NARIKYOU:
     case K_NARIKEI:
+    case K_NARIGIN:
         return move.move != M_AGARU
         && move.move != M_MIGI
         && move.move != M_HIDARI
         && move.move != M_MIGI_YORU
         && move.move != M_HIDARI_YORU
-        && move.move != M_HIKU;
+        && move.move != M_HIKU
+        && (move.koma != K_KIN || move.move != M_UTSU);
     case K_KAKU:
         return move.move != M_MIGI && move.move != M_MIGI_NARU
         && move.move != M_HIDARI && move.move != M_HIDARI_NARU
         && move.move != M_MIGI_HIKU && move.move != M_MIGI_HIKI_NARU
-        && move.move != M_HIDARI_HIKU && move.move != M_HIDARI_HIKI_NARU;
-    case K_HISYA:
+        && move.move != M_HIDARI_HIKU && move.move != M_HIDARI_HIKI_NARU
+        && move.move != M_UTSU;
+    case K_HISHA:
         return move.move != M_AGARU && move.move != M_NARU
         && move.move != M_MIGI_YORU && move.move != M_MIGI_YORI_NARU
         && move.move != M_HIDARI_YORU && move.move != M_HIDARI_YORI_NARU
-        && move.move != M_HIKU && move.move != M_HIKI_NARU;
-    default:
-        return 0;
+        && move.move != M_HIKU && move.move != M_HIKI_NARU
+        && move.move != M_UTSU;
+    case K_UMA:
+    case K_RYU:
+    case K_GYOKU:
+        return move.move == M_UTSU;
     }
 }
 
@@ -132,6 +141,8 @@ static unsigned remove_enter_outside(const void *elem, void *context) {
         result |= move.move == M_AGARU || move.move == M_NARU
         || move.move == M_MIGI || move.move == M_MIGI_NARU
         || move.move == M_HIDARI || move.move == M_HIDARI_NARU;
+    } else if (move.dan == 7 && move.koma == K_KEI) {
+        result |= move.move == M_HIDARI || move.move == M_MIGI;
     }
     if (move.suji == 0) {
         result |= move.move == M_MIGI || move.move == M_MIGI_NARU
@@ -158,11 +169,6 @@ static unsigned remove_enables_no_more_move(const void *elem, void *context) {
     }
 }
 
-static unsigned remove_gyoku_utsu(const void *elem, void *context) {
-    const struct move_detail move = move_detail(*(uint16_t *)elem);
-    return move.koma == K_GYOKU && move.move == M_UTSU;
-}
-
 int main() {
     const unsigned int N = NUMBER_OF_COLUMNS * NUMBER_OF_ROWS * NUMBER_OF_KOMA * NUMBER_OF_MOVES;
     uint16_t *const all_moves = malloc(sizeof(uint16_t) * N);
@@ -177,16 +183,32 @@ int main() {
     end = filter(all_moves, end, sizeof(uint16_t), remove_forbidden_move, NULL, all_moves);
     end = filter(all_moves, end, sizeof(uint16_t), remove_enter_outside, NULL, all_moves);
     end = filter(all_moves, end, sizeof(uint16_t), remove_enables_no_more_move, NULL, all_moves);
-    end = filter(all_moves, end, sizeof(uint16_t), remove_gyoku_utsu, NULL, all_moves);
 
     /* dump result */
     for (it = all_moves; it != end; ++it) {
         const intptr_t i = it - all_moves;
         struct move_detail move = move_detail(*it);
 
-        printf("[%5ld] %d %d %s %s\n", i, move.suji + 1, move.dan + 1, _str_koma(move.koma), _str_move(move.move));
+        printf("  MOVE_%d%d%s%s%s,\n", move.suji + 1, move.dan + 1, _str_koma(move.koma),
+        move.move ? "_" : "", move.move ? _str_move(move.move) : "");
     }
     free(all_moves);
+/*
+    {
+        uint16_t moves[] = {((K_GIN * NUMBER_OF_COLUMNS + 0) * NUMBER_OF_ROWS + 0) * NUMBER_OF_MOVES + M_UTSU};
+        end = filter(moves, moves + 1, sizeof(uint16_t), remove_improper_promotion, NULL, moves);
+        printf("remove_improper_promotion %s 11GIN_UTSU.\n", moves == end ? "REMOVES" : "preserves");
+
+        end = filter(moves, moves + 1, sizeof(uint16_t), remove_forbidden_move, NULL, moves);
+        printf("remove_forbidden_move %s 11GIN_UTSU.\n", moves == end ? "REMOVES" : "preserves");
+
+        end = filter(moves, moves + 1, sizeof(uint16_t), remove_enter_outside, NULL, moves);
+        printf("remove_enter_outside %s 11GIN_UTSU.\n", moves == end ? "REMOVES" : "preserves");
+
+        end = filter(moves, moves + 1, sizeof(uint16_t), remove_enables_no_more_move, NULL, moves);
+        printf("remove_enables_no_more_move %s 11GIN_UTSU.\n", moves == end ? "REMOVES" : "preserves");
+    }
+*/
     return 0;
 }
 #endif
