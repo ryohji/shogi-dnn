@@ -1,4 +1,4 @@
-#include "shogi.h"
+#include "move.h"
 
 #include <stdint.h>
 #include <stdlib.h>
