@@ -4,7 +4,7 @@
 /**
  * Moves that are not explicitly forbidden.
  */
-enum move
+enum act
 {
   MOVE_11FU_NARU,
   MOVE_12FU,

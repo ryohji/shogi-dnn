@@ -19,25 +19,25 @@ enum koma {
     K_GYOKU, /* gyokusho */
 };
 
-#define NUMBER_OF_MOVES 17
-enum move {
-    M_AGARU, /* go straight forward */
-    M_NARU, /* go forward and promote */
-    M_MIGI, /* go left ahead (from right) */
-    M_MIGI_NARU, /* go left ahead (from right) and promote */
-    M_HIDARI, /* go right ahead (from left) */
-    M_HIDARI_NARU, /* go right ahead (from left) */
-    M_MIGI_YORU, /* move left */
-    M_MIGI_YORI_NARU, /* move left and promote */
-    M_HIDARI_YORU, /* move right */
-    M_HIDARI_YORI_NARU, /* move right and promote */
-    M_MIGI_HIKU, /* back left */
-    M_MIGI_HIKI_NARU, /* back left and promote */
-    M_HIDARI_HIKU, /* back right */
-    M_HIDARI_HIKI_NARU, /* back right and promote */
-    M_HIKU, /* back straight */
-    M_HIKI_NARU, /* back and promote */
-    M_UTSU, /* put piece from hand */
+#define NUMBER_OF_ACTS 17
+enum act {
+    A_AGARU, /* go straight forward */
+    A_NARU, /* go forward and promote */
+    A_MIGI, /* go left ahead (from right) */
+    A_MIGI_NARU, /* go left ahead (from right) and promote */
+    A_HIDARI, /* go right ahead (from left) */
+    A_HIDARI_NARU, /* go right ahead (from left) */
+    A_MIGI_YORU, /* move left */
+    A_MIGI_YORI_NARU, /* move left and promote */
+    A_HIDARI_YORU, /* move right */
+    A_HIDARI_YORI_NARU, /* move right and promote */
+    A_MIGI_HIKU, /* back left */
+    A_MIGI_HIKI_NARU, /* back left and promote */
+    A_HIDARI_HIKU, /* back right */
+    A_HIDARI_HIKI_NARU, /* back right and promote */
+    A_HIKU, /* back straight */
+    A_HIKI_NARU, /* back and promote */
+    A_UTSU, /* put piece from hand */
 };
 
 #define NUMBER_OF_COLUMNS 9
