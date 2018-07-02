@@ -43,4 +43,15 @@ enum act {
 #define NUMBER_OF_COLUMNS 9
 #define NUMBER_OF_ROWS 9
 
+#define NUMBER_OF_MOVES 5703
+
+struct move {
+  int dan;
+  int suji;
+  enum koma koma;
+  enum act act;
+};
+
+struct move move_describe(unsigned code);
+
 #endif
