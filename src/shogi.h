@@ -62,20 +62,26 @@ enum player {
     WHITE, /* go-te */
 };
 
+#define NUMBER_OF_CELLS (9 * 9)
+#define NUMBER_OF_CAPTS ((9 + 2 + (9 - 1)) * 2) /* except for 2 gyoku */
+
 /**
  * Maintain the states of Shogi board.
  */
-struct board;
+struct board {
+    enum cell cell[NUMBER_OF_CELLS]; /* 99, 89, ..., 19, 98, 88, ...., 18, ..., 91, 81, ..., 11 */
+    enum captured captured[NUMBER_OF_CAPTS]; /* All shogi koma except two of Gyoku. Sorted */
+};
 
 /**
- * Allocate and initialize Shogi board.
+ * Acquire initialized copy of Shogi board.
  */
-struct board* board_new();
+struct board board_new();
 
 /**
- * Free the board.
+ * (Re-)Initialize given Shogi board.
  */
-void board_delete(struct board*);
+void board_init(struct board *board);
 
 /**
  * Acquire string representation of the board.

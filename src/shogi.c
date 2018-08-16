@@ -5,16 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NUMBER_OF_CELLS 81
-#define NUMBER_OF_CAPTS 38
-
-struct board {
-    enum cell cell[NUMBER_OF_CELLS]; /* 99, 89, ..., 19, 98, 88, ...., 18, ..., 91, 81, ..., 11 */
-    enum captured captured[NUMBER_OF_CAPTS]; /* All shogi koma except two of Gyoku. Sorted */
-};
-
-struct board* board_new() {
-    const enum cell init[NUMBER_OF_CELLS] = {
+struct board board_new() {
+    const struct board board = { {
         CELL_W_KYO, CELL_W_KEI, CELL_W_GIN, CELL_W_KIN, CELL_W_GYOKU, CELL_W_KIN, CELL_W_GIN, CELL_W_KEI, CELL_W_KYO,
         CELL_BLANK, CELL_W_HISHA, CELL_BLANK, CELL_BLANK, CELL_BLANK, CELL_BLANK, CELL_BLANK, CELL_W_KAKU, CELL_BLANK,
         CELL_W_FU, CELL_W_FU, CELL_W_FU, CELL_W_FU, CELL_W_FU, CELL_W_FU, CELL_W_FU, CELL_W_FU, CELL_W_FU,
@@ -24,15 +16,17 @@ struct board* board_new() {
         CELL_B_FU, CELL_B_FU, CELL_B_FU, CELL_B_FU, CELL_B_FU, CELL_B_FU, CELL_B_FU, CELL_B_FU, CELL_B_FU,
         CELL_BLANK, CELL_B_KAKU, CELL_BLANK, CELL_BLANK, CELL_BLANK, CELL_BLANK, CELL_BLANK, CELL_B_HISHA, CELL_BLANK,
         CELL_B_KYO, CELL_B_KEI, CELL_B_GIN, CELL_B_KIN, CELL_B_GYOKU, CELL_B_KIN, CELL_B_GIN, CELL_B_KEI, CELL_B_KYO,
-    };
-    struct board *const b = malloc(sizeof(struct board));
-    memcpy(b->cell, init, sizeof(init));
-    memset(b->captured, CAPT_BLANK, NUMBER_OF_CAPTS);
-    return b;
+    }, {
+        CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK,
+        CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK,
+        CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK,
+        CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK, CAPT_BLANK,
+    }, };
+    return board;
 }
 
-void board_delete(struct board *b) {
-    free(b);
+void board_init(struct board* board) {
+    *board = board_new();
 }
 
 static const char* _str_cell(enum cell cell) {
@@ -107,11 +101,11 @@ char* board_tostring(const struct board* b) {
 
 #ifdef UNITTEST_
 int main() {
-    struct board *const b = board_new();
-    char *str = board_tostring(b);
+    struct board b;
+    board_init(&b);
+    char *str = board_tostring(&b);
     puts(str);
     free(str);
-    board_delete(b);
     return 0;
 }
 #endif
