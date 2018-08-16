@@ -73,6 +73,16 @@ struct board {
     enum captured captured[NUMBER_OF_CAPTS]; /* All shogi koma except two of Gyoku. Sorted */
 };
 
+enum maybe {
+    Just,
+    Nothing,
+};
+
+struct board_maybe {
+    struct board board;
+    enum maybe maybe;
+};
+
 /**
  * Acquire initialized copy of Shogi board.
  */
@@ -82,6 +92,19 @@ struct board board_new();
  * (Re-)Initialize given Shogi board.
  */
 void board_init(struct board *board);
+
+/**
+ * Get the board, applied given move.
+ * 
+ * If given move can not be applied to the given board, maybe field of the returned board_maybe set Nothing.
+ * Otherwise set Just and board structure represents the board applied given move.
+ */
+struct board_maybe board_apply(const struct board *board, int move_code);
+
+/**
+ * Generate the board, the players inverted.
+ */
+struct board board_invert(const struct board *board);
 
 /**
  * Acquire string representation of the board.
