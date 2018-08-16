@@ -6,11 +6,11 @@
 #include <string.h>
 
 #define NUMBER_OF_CELLS 81
-#define NUMBER_OF_HANDS 38
+#define NUMBER_OF_CAPTS 38
 
 struct board {
     enum cell cell[NUMBER_OF_CELLS]; /* 99, 89, ..., 19, 98, 88, ...., 18, ..., 91, 81, ..., 11 */
-    enum cell hand[NUMBER_OF_HANDS]; /* All shogi koma except two of Gyoku. Sorted */
+    enum captured captured[NUMBER_OF_CAPTS]; /* All shogi koma except two of Gyoku. Sorted */
 };
 
 struct board* board_new() {
@@ -27,7 +27,7 @@ struct board* board_new() {
     };
     struct board *const b = malloc(sizeof(struct board));
     memcpy(b->cell, init, sizeof(init));
-    memset(b->hand, CELL_BLANK, NUMBER_OF_HANDS);
+    memset(b->captured, CAPT_BLANK, NUMBER_OF_CAPTS);
     return b;
 }
 
@@ -74,22 +74,22 @@ char* board_tostring(const struct board* b) {
     int hand[14] = {0};
     char *p = buffer;
     int i;
-    for (i = 0; i < NUMBER_OF_HANDS; ++i) {
-        switch (b->hand[i]) {
-        case CELL_W_FU: hand[0] += 1; break;
-        case CELL_W_KYO: hand[1] += 1; break;
-        case CELL_W_KEI: hand[2] += 1; break;
-        case CELL_W_GIN: hand[3] += 1; break;
-        case CELL_W_KIN: hand[4] += 1; break;
-        case CELL_W_KAKU: hand[5] += 1; break;
-        case CELL_W_HISHA: hand[6] += 1; break;
-        case CELL_B_FU: hand[7] += 1; break;
-        case CELL_B_KYO: hand[8] += 1; break;
-        case CELL_B_KEI: hand[9] += 1; break;
-        case CELL_B_GIN: hand[10] += 1; break;
-        case CELL_B_KIN: hand[11] += 1; break;
-        case CELL_B_KAKU: hand[12] += 1; break;
-        case CELL_B_HISHA: hand[13] += 1; break;
+    for (i = 0; i < NUMBER_OF_CAPTS; ++i) {
+        switch (b->captured[i]) {
+        case CAPT_W_FU: hand[0] += 1; break;
+        case CAPT_W_KYO: hand[1] += 1; break;
+        case CAPT_W_KEI: hand[2] += 1; break;
+        case CAPT_W_GIN: hand[3] += 1; break;
+        case CAPT_W_KIN: hand[4] += 1; break;
+        case CAPT_W_KAKU: hand[5] += 1; break;
+        case CAPT_W_HISHA: hand[6] += 1; break;
+        case CAPT_B_FU: hand[7] += 1; break;
+        case CAPT_B_KYO: hand[8] += 1; break;
+        case CAPT_B_KEI: hand[9] += 1; break;
+        case CAPT_B_GIN: hand[10] += 1; break;
+        case CAPT_B_KIN: hand[11] += 1; break;
+        case CAPT_B_KAKU: hand[12] += 1; break;
+        case CAPT_B_HISHA: hand[13] += 1; break;
         default: break;
         }
     }

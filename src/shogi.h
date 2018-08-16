@@ -36,6 +36,27 @@ enum cell {
     CELL_W_GYOKU,
 };
 
+/**
+ * States of Shogi captives.
+ */
+enum captured {
+    CAPT_B_HISHA,
+    CAPT_B_KAKU,
+    CAPT_B_KIN,
+    CAPT_B_GIN,
+    CAPT_B_KEI,
+    CAPT_B_KYO,
+    CAPT_B_FU,
+    CAPT_BLANK,
+    CAPT_W_FU,
+    CAPT_W_KYO,
+    CAPT_W_KEI,
+    CAPT_W_GIN,
+    CAPT_W_KIN,
+    CAPT_W_KAKU,
+    CAPT_W_HISHA,
+};
+
 enum player {
     BLACK, /* sen-te; the player who plays first */
     WHITE, /* go-te */
