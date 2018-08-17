@@ -9,7 +9,7 @@ static void reorder_captured(struct board *b);
 
 static void diagonal_swap(void *array, unsigned nelem, unsigned width);
 static void array_apply(void *array, unsigned nelem, unsigned width, void (*f)(void *));
-static enum cell inverted_cell(enum cell c);
+static void cell_invert(void* c);
 static enum captured inverted_captured(enum captured c);
 
 struct board board_new() {
@@ -40,9 +40,7 @@ struct board board_invert(const struct board *original) {
     struct board board = *original;
     unsigned i;
     diagonal_swap(board.cell, NUMBER_OF_CELLS, sizeof(enum cell));
-    for (i = 0; i < NUMBER_OF_CELLS; ++i) {
-        board.cell[i] = inverted_cell(board.cell[i]);
-    }
+    array_apply(board.cell, NUMBER_OF_CELLS, sizeof(enum cell), cell_invert);
     diagonal_swap(board.captured, NUMBER_OF_CAPTS, sizeof(enum captured));
     for (i = 0; i < NUMBER_OF_CAPTS; ++i) {
         board.captured[i] = inverted_captured(board.captured[i]);
@@ -153,37 +151,38 @@ void array_apply(void *array, unsigned nelem, unsigned width, void (*f)(void *))
     }
 }
 
-enum cell inverted_cell(enum cell c) {
-    switch (c) {
-    case CELL_B_GYOKU:   return CELL_W_GYOKU;
-    case CELL_B_RYU:     return CELL_W_RYU;
-    case CELL_B_HISHA:   return CELL_W_HISHA;
-    case CELL_B_UMA:     return CELL_W_UMA;
-    case CELL_B_KAKU:    return CELL_W_KAKU;
-    case CELL_B_KIN:     return CELL_W_KIN;
-    case CELL_B_NARIGIN: return CELL_W_NARIGIN;
-    case CELL_B_GIN:     return CELL_W_GIN;
-    case CELL_B_NARIKEI: return CELL_W_NARIKEI;
-    case CELL_B_KEI:     return CELL_W_KEI;
-    case CELL_B_NARIKYO: return CELL_W_NARIKYO;
-    case CELL_B_KYO:     return CELL_W_KYO;
-    case CELL_B_TO:      return CELL_W_TO;
-    case CELL_B_FU:      return CELL_W_FU;
-    case CELL_BLANK:     return CELL_BLANK;
-    case CELL_W_FU:      return CELL_B_FU;
-    case CELL_W_TO:      return CELL_B_TO;
-    case CELL_W_KYO:     return CELL_B_KYO;
-    case CELL_W_NARIKYO: return CELL_B_NARIKYO;
-    case CELL_W_KEI:     return CELL_B_KEI;
-    case CELL_W_NARIKEI: return CELL_B_NARIKEI;
-    case CELL_W_GIN:     return CELL_B_GIN;
-    case CELL_W_NARIGIN: return CELL_B_NARIGIN;
-    case CELL_W_KIN:     return CELL_B_KIN;
-    case CELL_W_KAKU:    return CELL_B_KAKU;
-    case CELL_W_UMA:     return CELL_B_UMA;
-    case CELL_W_HISHA:   return CELL_B_HISHA;
-    case CELL_W_RYU:     return CELL_B_RYU;
-    case CELL_W_GYOKU:   return CELL_B_GYOKU;
+void cell_invert(void* p) {
+    enum cell *c = p;
+    switch (*c) {
+    case CELL_B_GYOKU:   *c = CELL_W_GYOKU;   break;
+    case CELL_B_RYU:     *c = CELL_W_RYU;     break;
+    case CELL_B_HISHA:   *c = CELL_W_HISHA;   break;
+    case CELL_B_UMA:     *c = CELL_W_UMA;     break;
+    case CELL_B_KAKU:    *c = CELL_W_KAKU;    break;
+    case CELL_B_KIN:     *c = CELL_W_KIN;     break;
+    case CELL_B_NARIGIN: *c = CELL_W_NARIGIN; break;
+    case CELL_B_GIN:     *c = CELL_W_GIN;     break;
+    case CELL_B_NARIKEI: *c = CELL_W_NARIKEI; break;
+    case CELL_B_KEI:     *c = CELL_W_KEI;     break;
+    case CELL_B_NARIKYO: *c = CELL_W_NARIKYO; break;
+    case CELL_B_KYO:     *c = CELL_W_KYO;     break;
+    case CELL_B_TO:      *c = CELL_W_TO;      break;
+    case CELL_B_FU:      *c = CELL_W_FU;      break;
+    case CELL_BLANK:     *c = CELL_BLANK;     break;
+    case CELL_W_FU:      *c = CELL_B_FU;      break;
+    case CELL_W_TO:      *c = CELL_B_TO;      break;
+    case CELL_W_KYO:     *c = CELL_B_KYO;     break;
+    case CELL_W_NARIKYO: *c = CELL_B_NARIKYO; break;
+    case CELL_W_KEI:     *c = CELL_B_KEI;     break;
+    case CELL_W_NARIKEI: *c = CELL_B_NARIKEI; break;
+    case CELL_W_GIN:     *c = CELL_B_GIN;     break;
+    case CELL_W_NARIGIN: *c = CELL_B_NARIGIN; break;
+    case CELL_W_KIN:     *c = CELL_B_KIN;     break;
+    case CELL_W_KAKU:    *c = CELL_B_KAKU;    break;
+    case CELL_W_UMA:     *c = CELL_B_UMA;     break;
+    case CELL_W_HISHA:   *c = CELL_B_HISHA;   break;
+    case CELL_W_RYU:     *c = CELL_B_RYU;     break;
+    case CELL_W_GYOKU:   *c = CELL_B_GYOKU;   break;
     }
 }
 
