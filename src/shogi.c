@@ -8,7 +8,8 @@
 
 static void reorder_captured(struct board *b);
 
-static int release_matching(const struct move *move, struct board* board);
+static int release_matching(const struct move* move, struct board* board);
+static int move_matching(const struct move* move, struct board* board);
 static int can_be_move_in(enum cell c);
 
 struct board board_new() {
@@ -42,8 +43,9 @@ struct board_maybe board_apply(const struct board *original, int move_code) {
     if (move.act == A_UTSU && cell == CELL_BLANK
         && release_matching(&move, &result.board)) { /* from captured */
         result.maybe = Just;
-    } else if (move.act != A_UTSU && can_be_move_in(cell)) { /* from board */
-        /* TODO */
+    } else if (move.act != A_UTSU && can_be_move_in(cell)
+        && move_matching(&move, &result.board)) { /* from board */
+        result.maybe = Just;
     } else {
         /* There is no move. */
     }
@@ -179,6 +181,11 @@ enum captured koma_to_captured(enum koma koma) {
     case K_HISHA: return CAPT_B_HISHA;
     default:      return (enum captured)-1;
     }
+}
+
+int move_matching(const struct move* move, struct board* board) {
+    /* TODO */
+    return 0;
 }
 
 #ifdef UNITTEST_
