@@ -134,28 +134,6 @@ int compar_captured(const void *a, const void *b) {
     return *(const enum captured*)a - *(const enum captured*)b;
 }
 
-int can_be_move_in(enum cell c) {
-    switch (c) {
-    case CELL_W_FU:
-    case CELL_W_TO:
-    case CELL_W_KYO:
-    case CELL_W_NARIKYO:
-    case CELL_W_KEI:
-    case CELL_W_NARIKEI:
-    case CELL_W_GIN:
-    case CELL_W_NARIGIN:
-    case CELL_W_KIN:
-    case CELL_W_KAKU:
-    case CELL_W_UMA:
-    case CELL_W_HISHA:
-    case CELL_W_RYU:
-    case CELL_W_GYOKU:
-        return 0;
-    default:
-        return 1;
-    }
-}
-
 static enum captured koma_to_captured(enum koma koma);
 
 int release_matching(const struct move *move, struct board* board) {
@@ -186,6 +164,28 @@ enum captured koma_to_captured(enum koma koma) {
 int move_matching(const struct move* move, struct board* board) {
     /* TODO */
     return 0;
+}
+
+int can_be_move_in(enum cell c) {
+    switch (c) {
+    case CELL_W_FU:
+    case CELL_W_TO:
+    case CELL_W_KYO:
+    case CELL_W_NARIKYO:
+    case CELL_W_KEI:
+    case CELL_W_NARIKEI:
+    case CELL_W_GIN:
+    case CELL_W_NARIGIN:
+    case CELL_W_KIN:
+    case CELL_W_KAKU:
+    case CELL_W_UMA:
+    case CELL_W_HISHA:
+    case CELL_W_RYU:
+    case CELL_W_GYOKU:
+        return 0;
+    default:
+        return 1;
+    }
 }
 
 #ifdef UNITTEST_
