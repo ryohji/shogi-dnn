@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void reorder_captured(struct board *b);
-
 static enum cell* cell_targeted(struct board* board, const struct move* move);
 /**
  * Replace one of `target` by `update` and return non-zero if `target` in the `board`,
@@ -149,13 +147,7 @@ char* board_tostring(const struct board* b) {
 }
 
 /* static helper functions */
-static int compar_captured(const void *a, const void *b);
-
-void reorder_captured(struct board *b) {
-    qsort(b->captured, NUMBER_OF_CAPTS, sizeof(enum captured), compar_captured);
-}
-
-int compar_captured(const void *a, const void *b) {
+static int compar_captured(const void *a, const void *b) {
     return *(const enum captured*)a - *(const enum captured*)b;
 }
 
