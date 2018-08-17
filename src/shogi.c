@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+static void reorder_captured(struct board *b);
+
 struct board board_new() {
     const struct board board = { {
         CELL_W_KYO, CELL_W_KEI, CELL_W_GIN, CELL_W_KIN, CELL_W_GYOKU, CELL_W_KIN, CELL_W_GIN, CELL_W_KEI, CELL_W_KYO,
@@ -97,6 +99,17 @@ char* board_tostring(const struct board* b) {
     p += sprintf(p, "c-%d a-%d 9-%d 7-%d 5-%d 3-%d 1-%02d",
         hand[13], hand[12], hand[11], hand[10], hand[9], hand[8], hand[7]);
     return strdup(buffer);
+}
+
+/* static helper functions */
+static int compar_captured(const void *a, const void *b);
+
+void reorder_captured(struct board *b) {
+    qsort(b->captured, NUMBER_OF_CAPTS, sizeof(enum captured), compar_captured);
+}
+
+int compar_captured(const void *a, const void *b) {
+    return *(const enum captured*)a - *(const enum captured*)b;
 }
 
 #ifdef UNITTEST_
