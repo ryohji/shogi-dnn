@@ -1,4 +1,5 @@
 #include "shogi.h"
+#include "move.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -6,6 +7,8 @@
 #include <string.h>
 
 static void reorder_captured(struct board *b);
+
+static int can_be_move_in(enum cell c);
 
 struct board board_new() {
     const struct board board = { {
@@ -30,6 +33,18 @@ struct board board_new() {
 void board_init(struct board* board) {
     *board = board_new();
 }
+
+struct board_maybe board_apply(const struct board *original, int move_code) {
+    const struct move move = move_describe(move_code);
+    enum cell cell = original->cell[(8 - move.dan) * 9 + move.suji];
+    if (can_be_move_in(cell)) {
+        /* TODO */
+    } else {
+        struct board_maybe result = {*original, Nothing};
+        return result;
+    }
+}
+
 
 static const char* _str_cell(enum cell cell) {
     switch (cell) {
@@ -110,6 +125,28 @@ void reorder_captured(struct board *b) {
 
 int compar_captured(const void *a, const void *b) {
     return *(const enum captured*)a - *(const enum captured*)b;
+}
+
+int can_be_move_in(enum cell c) {
+    switch (c) {
+    case CELL_W_FU:
+    case CELL_W_TO:
+    case CELL_W_KYO:
+    case CELL_W_NARIKYO:
+    case CELL_W_KEI:
+    case CELL_W_NARIKEI:
+    case CELL_W_GIN:
+    case CELL_W_NARIGIN:
+    case CELL_W_KIN:
+    case CELL_W_KAKU:
+    case CELL_W_UMA:
+    case CELL_W_HISHA:
+    case CELL_W_RYU:
+    case CELL_W_GYOKU:
+        return 0;
+    default:
+        return 1;
+    }
 }
 
 #ifdef UNITTEST_
