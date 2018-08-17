@@ -168,20 +168,20 @@ int move_matching(const struct move* move, struct board* board) {
 
 int can_be_move_in(enum cell c) {
     switch (c) {
-    case CELL_W_FU:
-    case CELL_W_TO:
-    case CELL_W_KYO:
-    case CELL_W_NARIKYO:
-    case CELL_W_KEI:
-    case CELL_W_NARIKEI:
-    case CELL_W_GIN:
-    case CELL_W_NARIGIN:
-    case CELL_W_KIN:
-    case CELL_W_KAKU:
-    case CELL_W_UMA:
-    case CELL_W_HISHA:
-    case CELL_W_RYU:
-    case CELL_W_GYOKU:
+    case CELL_B_FU:
+    case CELL_B_TO:
+    case CELL_B_KYO:
+    case CELL_B_NARIKYO:
+    case CELL_B_KEI:
+    case CELL_B_NARIKEI:
+    case CELL_B_GIN:
+    case CELL_B_NARIGIN:
+    case CELL_B_KIN:
+    case CELL_B_KAKU:
+    case CELL_B_UMA:
+    case CELL_B_HISHA:
+    case CELL_B_RYU:
+    case CELL_B_GYOKU:
         return 0;
     default:
         return 1;
