@@ -8,6 +8,7 @@
 
 static void reorder_captured(struct board *b);
 
+static int dup_Fu(const struct move* move, const struct board* board);
 static int release_matching(const struct move* move, struct board* board);
 static int move_matching(const struct move* move, struct board* board);
 static int can_be_move_in(enum cell c);
@@ -40,7 +41,7 @@ struct board_maybe board_apply(const struct board *original, int move_code) {
     struct board_maybe result = {*original, Nothing};
     const struct move move = move_describe(move_code);
     enum cell cell = original->cell[(8 - move.dan) * 9 + move.suji];
-    if (move.act == A_UTSU && cell == CELL_BLANK
+    if (move.act == A_UTSU && cell == CELL_BLANK && (move.koma != K_FU || !dup_Fu(&move, original))
         && release_matching(&move, &result.board)) { /* from captured */
         result.maybe = Just;
     } else if (move.act != A_UTSU && can_be_move_in(cell)
@@ -132,6 +133,15 @@ void reorder_captured(struct board *b) {
 
 int compar_captured(const void *a, const void *b) {
     return *(const enum captured*)a - *(const enum captured*)b;
+}
+
+int dup_Fu(const struct move* move, const struct board* board) {
+    const enum cell* it = board->cell + move->suji;
+    const enum cell* const end = it + NUMBER_OF_CELLS;
+    while (it != end && *it != CELL_B_FU) {
+        it += 9;
+    }
+    return it != end;
 }
 
 static enum captured koma_to_captured(enum koma koma);
