@@ -9,7 +9,11 @@
 static void reorder_captured(struct board *b);
 
 static enum cell* cell_targeted(struct board* board, const struct move* move);
-static enum captured* captured_pos(struct board* board, enum captured captured);
+/**
+ * Replace one of `target` by `update` and return non-zero if `target` in the `board`,
+ * otherwise the `board` untouched and return zero.
+ */
+static int captured_update(struct board* board, enum captured target, enum captured update);
 static int dup_Fu(const struct move* move, const struct board* board);
 static int uchi_Fu_zume(const struct move* move, const struct board* board);
 static int release_matching(const struct move* move, struct board* board);
@@ -146,10 +150,18 @@ enum cell* cell_targeted(struct board* board, const struct move* move) {
     return board->cell + (8 - move->dan) * 9 + move->suji;
 }
 
-enum captured* captured_pos(struct board* board, enum captured captured) {
-    return bsearch(&captured, board->captured, NUMBER_OF_CAPTS, sizeof(enum captured), compar_captured);
+int captured_update(struct board* board, enum captured target, enum captured update) {
+    const size_t width = sizeof(enum captured);
+    enum captured* const array = board->captured;
+    enum captured* const pos = bsearch(&target, array, NUMBER_OF_CAPTS, width, compar_captured);
+    if (pos) {
+        *pos = update;
+        qsort(array, NUMBER_OF_CAPTS, width, compar_captured);
+        return !0;
+    } else {
+        return 0;
+    }
 }
-
 
 int dup_Fu(const struct move* move, const struct board* board) {
     const enum cell* it = board->cell + move->suji;
@@ -168,14 +180,7 @@ int uchi_Fu_zume(const struct move* move, const struct board* board) {
 static enum captured koma_to_captured(enum koma koma);
 
 int release_matching(const struct move *move, struct board* board) {
-    enum captured* const p = captured_pos(board, koma_to_captured(move->koma));
-    if (p != NULL) { /* there is matching captured */
-        *p = CAPT_BLANK; /* release a captive */
-        reorder_captured(board);
-        return !0;
-    } else {
-        return 0;
-    }
+    return captured_update(board, koma_to_captured(move->koma), CAPT_BLANK);
 }
 
 enum captured koma_to_captured(enum koma koma) {
@@ -217,11 +222,7 @@ int move_matching(const struct move* move, struct board* board) {
     enum cell* const origin = koma_origin(move, board->cell);
     if (origin != board->cell + NUMBER_OF_CELLS) {
         enum cell* const target = cell_targeted(board, move);
-        enum captured* const blank = captured_pos(board, CAPT_BLANK);
-        if (blank) {
-            *blank = cell_to_captured(*target);
-            reorder_captured(board);
-        }
+        (void) captured_update(board, CAPT_BLANK, cell_to_captured(*target));
         *target = koma_to_cell(with_promotion(move->koma, move->act));
         *origin = CELL_BLANK;
         return !0;
