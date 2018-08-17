@@ -9,6 +9,7 @@
 static void reorder_captured(struct board *b);
 
 static enum cell* cell_targeted(struct board* board, const struct move* move);
+static enum captured* captured_pos(struct board* board, enum captured captured);
 static int dup_Fu(const struct move* move, const struct board* board);
 static int uchi_Fu_zume(const struct move* move, const struct board* board);
 static int release_matching(const struct move* move, struct board* board);
@@ -145,6 +146,11 @@ enum cell* cell_targeted(struct board* board, const struct move* move) {
     return board->cell + (8 - move->dan) * 9 + move->suji;
 }
 
+enum captured* captured_pos(struct board* board, enum captured captured) {
+    return bsearch(&captured, board->captured, NUMBER_OF_CAPTS, sizeof(enum captured), compar_captured);
+}
+
+
 int dup_Fu(const struct move* move, const struct board* board) {
     const enum cell* it = board->cell + move->suji;
     const enum cell* const end = it + NUMBER_OF_CELLS;
@@ -162,8 +168,7 @@ int uchi_Fu_zume(const struct move* move, const struct board* board) {
 static enum captured koma_to_captured(enum koma koma);
 
 int release_matching(const struct move *move, struct board* board) {
-    enum captured key = koma_to_captured(move->koma);
-    enum captured*const p = bsearch(&key, board->captured, NUMBER_OF_CAPTS, sizeof(enum captured), compar_captured);
+    enum captured* const p = captured_pos(board, koma_to_captured(move->koma));
     if (p != NULL) { /* there is matching captured */
         *p = CAPT_BLANK; /* release a captive */
         reorder_captured(board);
@@ -212,9 +217,9 @@ int move_matching(const struct move* move, struct board* board) {
     enum cell* const origin = koma_origin(move, board->cell);
     if (origin != board->cell + NUMBER_OF_CELLS) {
         enum cell* const target = cell_targeted(board, move);
-        enum captured captured = cell_to_captured(*target);
-        if (captured != CAPT_BLANK) {
-            board->captured[NUMBER_OF_CAPTS - 1] = captured;
+        enum captured* const blank = captured_pos(board, CAPT_BLANK);
+        if (blank) {
+            *blank = cell_to_captured(*target);
             reorder_captured(board);
         }
         *target = koma_to_cell(with_promotion(move->koma, move->act));
