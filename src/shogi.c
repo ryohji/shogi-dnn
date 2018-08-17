@@ -35,6 +35,20 @@ void board_init(struct board* board) {
     *board = board_new();
 }
 
+struct board board_invert(const struct board *original) {
+    struct board board = *original;
+    unsigned i;
+    diagonal_swap(board.cell, NUMBER_OF_CELLS, sizeof(enum cell));
+    for (i = 0; i < NUMBER_OF_CELLS; ++i) {
+        board.cell[i] = inverted_cell(board.cell[i]);
+    }
+    diagonal_swap(board.captured, NUMBER_OF_CAPTS, sizeof(enum captured));
+    for (i = 0; i < NUMBER_OF_CAPTS; ++i) {
+        board.captured[i] = inverted_captured(board.captured[i]);
+    }
+    return board;
+}
+
 static const char* _str_cell(enum cell cell) {
     switch (cell) {
     case CELL_B_GYOKU: return "Be";
@@ -190,6 +204,14 @@ int main() {
     char *str = board_tostring(&b);
     puts(str);
     free(str);
+
+    b.cell[18] = CELL_BLANK;
+    b.cell[27] = CELL_W_FU;
+    b = board_invert(&b);
+    str = board_tostring(&b);
+    puts(str);
+    free(str);
+
     return 0;
 }
 #endif
