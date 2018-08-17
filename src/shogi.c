@@ -8,6 +8,7 @@
 
 static void reorder_captured(struct board *b);
 
+static enum cell* cell_targeted(struct board* board, const struct move* move);
 static int dup_Fu(const struct move* move, const struct board* board);
 static int uchi_Fu_zume(const struct move* move, const struct board* board);
 static int release_matching(const struct move* move, struct board* board);
@@ -43,7 +44,7 @@ void board_init(struct board* board) {
 struct board_maybe board_apply(const struct board *original, int move_code) {
     struct board_maybe result = {*original, Nothing};
     const struct move move = move_describe(move_code);
-    enum cell* const cell = result.board.cell + (8 - move.dan) * 9 + move.suji;
+    enum cell* const cell = cell_targeted(&result.board, &move);
     if (move.act == A_UTSU && *cell == CELL_BLANK
         && (move.koma != K_FU || !(dup_Fu(&move, original) || uchi_Fu_zume(&move, original)))
         && release_matching(&move, &result.board)) { /* from captured */
@@ -140,6 +141,10 @@ int compar_captured(const void *a, const void *b) {
     return *(const enum captured*)a - *(const enum captured*)b;
 }
 
+enum cell* cell_targeted(struct board* board, const struct move* move) {
+    return board->cell + (8 - move->dan) * 9 + move->suji;
+}
+
 int dup_Fu(const struct move* move, const struct board* board) {
     const enum cell* it = board->cell + move->suji;
     const enum cell* const end = it + NUMBER_OF_CELLS;
@@ -206,7 +211,7 @@ static enum koma with_promotion(enum koma koma, enum act act);
 int move_matching(const struct move* move, struct board* board) {
     enum cell* const origin = koma_origin(move, board->cell);
     if (origin != board->cell + NUMBER_OF_CELLS) {
-        enum cell* const target = board->cell + (8 - move->dan) * 9 + move->suji;
+        enum cell* const target = cell_targeted(board, move);
         enum captured captured = cell_to_captured(*target);
         if (captured != CAPT_BLANK) {
             board->captured[NUMBER_OF_CAPTS - 1] = captured;
