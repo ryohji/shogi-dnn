@@ -1,9 +1,9 @@
 .PHONY: clean
 
-shogi_test: move.o
+shogi_test: move.o shogi.h shogi.c
 	$(CC) -o $@ -DUNITTEST_ move.o shogi.c
 
-move_test: filter.o
+move_test: filter.o move.h move.c
 	$(CC) -o $@ -DUNITTEST_ filter.o move.c
 
 clean:
