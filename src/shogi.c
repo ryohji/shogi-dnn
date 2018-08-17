@@ -9,6 +9,7 @@
 static void reorder_captured(struct board *b);
 
 static int dup_Fu(const struct move* move, const struct board* board);
+static int uchi_Fu_zume(const struct move* move, const struct board* board);
 static int release_matching(const struct move* move, struct board* board);
 static enum cell koma_to_cell(enum koma koma);
 static int move_matching(const struct move* move, struct board* board);
@@ -44,7 +45,7 @@ struct board_maybe board_apply(const struct board *original, int move_code) {
     const struct move move = move_describe(move_code);
     enum cell* const cell = result.board.cell + (8 - move.dan) * 9 + move.suji;
     if (move.act == A_UTSU && *cell == CELL_BLANK
-        && (move.koma != K_FU || !dup_Fu(&move, original))
+        && (move.koma != K_FU || !(dup_Fu(&move, original) || uchi_Fu_zume(&move, original)))
         && release_matching(&move, &result.board)) { /* from captured */
         *cell = koma_to_cell(move.koma);
         result.maybe = Just;
@@ -152,6 +153,11 @@ int dup_Fu(const struct move* move, const struct board* board) {
         it += 9;
     }
     return it != end;
+}
+
+int uchi_Fu_zume(const struct move* move, const struct board* board) {
+    /* TODO */
+    return 0;
 }
 
 static enum captured koma_to_captured(enum koma koma);
