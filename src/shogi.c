@@ -7,6 +7,7 @@
 
 static void reorder_captured(struct board *b);
 
+static void diagonal_swap(void *array, unsigned nelem, unsigned width);
 static enum cell inverted_cell(enum cell c);
 static enum captured inverted_captured(enum captured c);
 
@@ -113,6 +114,19 @@ void reorder_captured(struct board *b) {
 
 int compar_captured(const void *a, const void *b) {
     return *(const enum captured*)a - *(const enum captured*)b;
+}
+
+void diagonal_swap(void *array, unsigned nelem, unsigned width) {
+    char *const t = alloca(width);
+    char *p = array;
+    char *q = p + (nelem - 1) * width;
+    while (p < q) {
+        memcpy(t, p, width);
+        memcpy(p, q, width);
+        memcpy(q, t, width);
+        p += width;
+        q -= width;
+    }
 }
 
 enum cell inverted_cell(enum cell c) {
