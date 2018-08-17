@@ -10,6 +10,7 @@ static void reorder_captured(struct board *b);
 
 static int dup_Fu(const struct move* move, const struct board* board);
 static int release_matching(const struct move* move, struct board* board);
+static enum cell koma_to_cell(enum koma koma);
 static int move_matching(const struct move* move, struct board* board);
 static int can_be_move_in(enum cell c);
 
@@ -40,11 +41,13 @@ void board_init(struct board* board) {
 struct board_maybe board_apply(const struct board *original, int move_code) {
     struct board_maybe result = {*original, Nothing};
     const struct move move = move_describe(move_code);
-    enum cell cell = original->cell[(8 - move.dan) * 9 + move.suji];
-    if (move.act == A_UTSU && cell == CELL_BLANK && (move.koma != K_FU || !dup_Fu(&move, original))
+    enum cell* const cell = result.board.cell + (8 - move.dan) * 9 + move.suji;
+    if (move.act == A_UTSU && *cell == CELL_BLANK
+        && (move.koma != K_FU || !dup_Fu(&move, original))
         && release_matching(&move, &result.board)) { /* from captured */
+        *cell = koma_to_cell(move.koma);
         result.maybe = Just;
-    } else if (move.act != A_UTSU && can_be_move_in(cell)
+    } else if (move.act != A_UTSU && can_be_move_in(*cell)
         && move_matching(&move, &result.board)) { /* from board */
         result.maybe = Just;
     } else {
@@ -168,6 +171,25 @@ enum captured koma_to_captured(enum koma koma) {
     case K_KAKU:  return CAPT_B_KAKU;
     case K_HISHA: return CAPT_B_HISHA;
     default:      return (enum captured)-1;
+    }
+}
+
+enum cell koma_to_cell(enum koma koma) {
+    switch (koma) {
+    case K_FU:       return CELL_B_FU;
+    case K_TO:       return CELL_B_TO;
+    case K_KYOU:     return CELL_B_KYO;
+    case K_NARIKYOU: return CELL_B_NARIKYO;
+    case K_KEI:      return CELL_B_KEI;
+    case K_NARIKEI:  return CELL_B_NARIKEI;
+    case K_GIN:      return CELL_B_GIN;
+    case K_NARIGIN:  return CELL_B_NARIGIN;
+    case K_KIN:      return CELL_B_KIN;
+    case K_KAKU:     return CELL_B_KAKU;
+    case K_UMA:      return CELL_B_UMA;
+    case K_HISHA:    return CELL_B_HISHA;
+    case K_RYU:      return CELL_B_RYU;
+    case K_GYOKU:    return CELL_B_GYOKU;
     }
 }
 
