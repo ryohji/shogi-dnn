@@ -51,12 +51,6 @@ struct board_maybe board_apply(const struct board *original, int move_code) {
         result.maybe = Just;
     } else if (move.act != A_UTSU && can_be_move_in(*cell)
         && move_matching(&move, &result.board)) { /* from board */
-        const enum captured capt = cell_to_captured(*cell);
-        if (capt != CAPT_BLANK) {
-            result.board.captured[NUMBER_OF_CAPTS - 1] = capt;
-            reorder_captured(&result.board);
-        }
-        *cell = koma_to_cell(move.koma);
         result.maybe = Just;
     } else {
         /* There is no move. */
@@ -206,9 +200,65 @@ enum cell koma_to_cell(enum koma koma) {
     }
 }
 
+static enum cell* koma_origin(const struct move* move, enum cell* board);
+static enum koma with_promotion(enum koma koma, enum act act);
+
 int move_matching(const struct move* move, struct board* board) {
+    enum cell* const origin = koma_origin(move, board->cell);
+    if (origin != board->cell + NUMBER_OF_CELLS) {
+        enum cell* const target = board->cell + (8 - move->dan) * 9 + move->suji;
+        enum captured captured = cell_to_captured(*target);
+        if (captured != CAPT_BLANK) {
+            board->captured[NUMBER_OF_CAPTS - 1] = captured;
+            reorder_captured(board);
+        }
+        *target = koma_to_cell(with_promotion(move->koma, move->act));
+        *origin = CELL_BLANK;
+        return !0;
+    } else {
+        return 0;
+    }
+}
+
+enum cell* koma_origin(const struct move* move, enum cell* board) {
     /* TODO */
-    return 0;
+    return board + NUMBER_OF_CELLS;
+}
+
+static int promoting(enum act act);
+
+enum koma with_promotion(enum koma koma, enum act act) {
+    if (promoting(act)) {
+        switch (koma) {
+        case K_FU:      return K_TO;
+        case K_KYOU:    return K_NARIKYOU;
+        case K_KEI:     return K_NARIKEI;
+        case K_GIN:     return K_NARIGIN;
+        case K_KAKU:    return K_UMA;
+        case K_HISHA:   return K_RYU;
+        default:
+            fprintf(stderr, "Invalid promotion: koma=%d act=%d\n", koma, act);
+            return koma;
+        }
+    } else {
+        return koma;
+    }
+}
+
+int promoting(enum act act) {
+    switch (act) {
+    case A_NARU:
+    case A_MIGI_NARU:
+    case A_HIDARI_NARU:
+    case A_MIGI_YORI_NARU:
+    case A_HIDARI_YORI_NARU:
+    case A_MIGI_HIKI_NARU:
+    case A_HIDARI_HIKI_NARU:
+    case A_HIKI_NARU:
+        return !0;
+    default:
+        return 0;
+    }
 }
 
 int can_be_move_in(enum cell c) {
@@ -229,7 +279,7 @@ int can_be_move_in(enum cell c) {
     case CELL_B_GYOKU:
         return 0;
     default:
-        return 1;
+        return !0;
     }
 }
 
