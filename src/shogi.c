@@ -8,6 +8,7 @@
 
 static void reorder_captured(struct board *b);
 
+static int release_matching(const struct move *move, struct board* board);
 static int can_be_move_in(enum cell c);
 
 struct board board_new() {
@@ -35,14 +36,18 @@ void board_init(struct board* board) {
 }
 
 struct board_maybe board_apply(const struct board *original, int move_code) {
+    struct board_maybe result = {*original, Nothing};
     const struct move move = move_describe(move_code);
     enum cell cell = original->cell[(8 - move.dan) * 9 + move.suji];
-    if (can_be_move_in(cell)) {
+    if (move.act == A_UTSU && cell == CELL_BLANK
+        && release_matching(&move, &result.board)) { /* from captured */
+        result.maybe = Just;
+    } else if (move.act != A_UTSU && can_be_move_in(cell)) { /* from board */
         /* TODO */
     } else {
-        struct board_maybe result = {*original, Nothing};
-        return result;
+        /* There is no move. */
     }
+    return result;
 }
 
 
@@ -146,6 +151,33 @@ int can_be_move_in(enum cell c) {
         return 0;
     default:
         return 1;
+    }
+}
+
+static enum captured koma_to_captured(enum koma koma);
+
+int release_matching(const struct move *move, struct board* board) {
+    enum captured key = koma_to_captured(move->koma);
+    enum captured*const p = bsearch(&key, board->captured, NUMBER_OF_CAPTS, sizeof(enum captured), compar_captured);
+    if (p != NULL) { /* there is matching captured */
+        *p = CAPT_BLANK; /* release a captive */
+        reorder_captured(board);
+        return !0;
+    } else {
+        return 0;
+    }
+}
+
+enum captured koma_to_captured(enum koma koma) {
+    switch (koma) {
+    case K_FU:    return CAPT_B_FU;
+    case K_KYOU:  return CAPT_B_KYO;
+    case K_KEI:   return CAPT_B_KEI;
+    case K_GIN:   return CAPT_B_GIN;
+    case K_KIN:   return CAPT_B_KIN;
+    case K_KAKU:  return CAPT_B_KAKU;
+    case K_HISHA: return CAPT_B_HISHA;
+    default:      return (enum captured)-1;
     }
 }
 
