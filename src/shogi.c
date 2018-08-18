@@ -264,7 +264,7 @@ struct cells cells_from(const struct move* move, enum cell* cells) {
     unsigned d = move->dan;
     unsigned s = move->suji;
 
-#define CELL_PTR(dan, suji) (cells + (8 - dan) * 9 + (8 - suji))
+#define CELL_PTR(suji, dan) (cells + (8 - dan) * 9 + (8 - suji))
 
     switch (move->act) {
     case A_AGARU:
@@ -274,12 +274,12 @@ struct cells cells_from(const struct move* move, enum cell* cells) {
         case K_HISHA:
         case K_RYU:
             while (d-- != 0) {
-                value.cell[value.n++] = CELL_PTR(d, s);
+                value.cell[value.n++] = CELL_PTR(s, d);
             }
             break;
         default:
             value.n = 1;
-            value.cell[0] = CELL_PTR(d - 1, s);
+            value.cell[0] = CELL_PTR(s, d - 1);
             break;
         }
         return value;
@@ -289,16 +289,16 @@ struct cells cells_from(const struct move* move, enum cell* cells) {
         case K_KAKU:
         case K_UMA:
             while (d-- != 0 && s-- != 0) {
-                value.cell[value.n++] = CELL_PTR(d, s);
+                value.cell[value.n++] = CELL_PTR(s, d);
             }
             break;
         case K_KEI:
             value.n = 1;
-            value.cell[0] = CELL_PTR(d - 2, s - 1);
+            value.cell[0] = CELL_PTR(s - 1, d - 2);
             break;
         default:
             value.n = 1;
-            value.cell[0] = CELL_PTR(d - 1, s - 1);
+            value.cell[0] = CELL_PTR(s - 1, d - 1);
             break;
         }
         return value;
@@ -308,16 +308,16 @@ struct cells cells_from(const struct move* move, enum cell* cells) {
         case K_KAKU:
         case K_UMA:
             while (d-- != 0 && s++ != 8) {
-                value.cell[value.n++] = CELL_PTR(d, s);
+                value.cell[value.n++] = CELL_PTR(s, d);
             }
             break;
         case K_KEI:
             value.n = 1;
-            value.cell[0] = CELL_PTR(d - 2, s + 1);
+            value.cell[0] = CELL_PTR(s + 1, d - 2);
             break;
         default:
             value.n = 1;
-            value.cell[0] = CELL_PTR(d - 1, s + 1);
+            value.cell[0] = CELL_PTR(s + 1, d - 1);
             break;
         }
         return value;
@@ -327,12 +327,12 @@ struct cells cells_from(const struct move* move, enum cell* cells) {
         case K_HISHA:
         case K_RYU:
             while (s-- != 0) {
-                value.cell[value.n++] = CELL_PTR(d, s);
+                value.cell[value.n++] = CELL_PTR(s, d);
             }
             break;
         default:
             value.n = 1;
-            value.cell[0] = CELL_PTR(d, s - 1);
+            value.cell[0] = CELL_PTR(s - 1, d);
             break;
         }
         return value;
@@ -342,12 +342,12 @@ struct cells cells_from(const struct move* move, enum cell* cells) {
         case K_KAKU:
         case K_UMA:
             while (s++ != 8) {
-                value.cell[value.n++] = CELL_PTR(d, s);
+                value.cell[value.n++] = CELL_PTR(s, d);
             }
             break;
         default:
             value.n = 1;
-            value.cell[0] = CELL_PTR(d, s + 1);
+            value.cell[0] = CELL_PTR(s + 1, d);
             break;
         }
         return value;
@@ -357,12 +357,12 @@ struct cells cells_from(const struct move* move, enum cell* cells) {
         case K_KAKU:
         case K_UMA:
             while (d++ != 8 && s-- != 0) {
-                value.cell[value.n++] = CELL_PTR(d, s);
+                value.cell[value.n++] = CELL_PTR(s, d);
             }
             break;
         default:
             value.n = 1;
-            value.cell[0] = CELL_PTR(d + 1, s - 1);
+            value.cell[0] = CELL_PTR(s - 1, d + 1);
             break;
         }
         return value;
@@ -372,12 +372,12 @@ struct cells cells_from(const struct move* move, enum cell* cells) {
         case K_KAKU:
         case K_UMA:
             while (d++ != 8 && s++ != 8) {
-                value.cell[value.n++] = CELL_PTR(d, s);
+                value.cell[value.n++] = CELL_PTR(s, d);
             }
             break;
         default:
             value.n = 1;
-            value.cell[0] = CELL_PTR(d + 1, s + 1);
+            value.cell[0] = CELL_PTR(s + 1, d + 1);
             break;
         }
         return value;
@@ -387,12 +387,12 @@ struct cells cells_from(const struct move* move, enum cell* cells) {
         case K_HISHA:
         case K_RYU:
             while (d++ != 8) {
-                value.cell[value.n++] = CELL_PTR(d, s);
+                value.cell[value.n++] = CELL_PTR(s, d);
             }
             break;
         default:
             value.n = 1;
-            value.cell[0] = CELL_PTR(d + 1, s);
+            value.cell[0] = CELL_PTR(s, d + 1);
             break;
         }
         return value;
