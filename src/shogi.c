@@ -297,7 +297,7 @@ struct cells cells_from(const struct move* move, enum cell* cells) {
             value.cell[0] = CELL_PTR(d - 2, s - 1);
             break;
         default:
-            value.n  = 1;
+            value.n = 1;
             value.cell[0] = CELL_PTR(d - 1, s - 1);
             break;
         }
@@ -316,12 +316,86 @@ struct cells cells_from(const struct move* move, enum cell* cells) {
             value.cell[0] = CELL_PTR(d - 2, s + 1);
             break;
         default:
-            value.n  = 1;
+            value.n = 1;
             value.cell[0] = CELL_PTR(d - 1, s + 1);
             break;
         }
         return value;
-    /* TODO */
+    case A_MIGI_YORU: /* origin exists relatively right hand. */
+    case A_MIGI_YORI_NARU:
+        switch (move->koma) {
+        case K_HISHA:
+        case K_RYU:
+            while (s-- != 0) {
+                value.cell[value.n++] = CELL_PTR(d, s);
+            }
+            break;
+        default:
+            value.n = 1;
+            value.cell[0] = CELL_PTR(d, s - 1);
+            break;
+        }
+        return value;
+    case A_HIDARI_YORU: /* origin exists relatively left hand. */
+    case A_HIDARI_YORI_NARU:
+        switch (move->koma) {
+        case K_KAKU:
+        case K_UMA:
+            while (s++ != 8) {
+                value.cell[value.n++] = CELL_PTR(d, s);
+            }
+            break;
+        default:
+            value.n = 1;
+            value.cell[0] = CELL_PTR(d, s + 1);
+            break;
+        }
+        return value;
+    case A_MIGI_HIKU: /* origin exists relatively right hand. */
+    case A_MIGI_HIKI_NARU:
+        switch (move->koma) {
+        case K_KAKU:
+        case K_UMA:
+            while (d++ != 8 && s-- != 0) {
+                value.cell[value.n++] = CELL_PTR(d, s);
+            }
+            break;
+        default:
+            value.n = 1;
+            value.cell[0] = CELL_PTR(d + 1, s - 1);
+            break;
+        }
+        return value;
+    case A_HIDARI_HIKU: /* origin exists relatively left hand. */
+    case A_HIDARI_HIKI_NARU:
+        switch (move->koma) {
+        case K_KAKU:
+        case K_UMA:
+            while (d++ != 8 && s++ != 8) {
+                value.cell[value.n++] = CELL_PTR(d, s);
+            }
+            break;
+        default:
+            value.n = 1;
+            value.cell[0] = CELL_PTR(d + 1, s + 1);
+            break;
+        }
+        return value;
+    case A_HIKU:
+    case A_HIKI_NARU:
+        switch (move->koma) {
+        case K_HISHA:
+        case K_RYU:
+            while (d++ != 8) {
+                value.cell[value.n++] = CELL_PTR(d, s);
+            }
+            break;
+        default:
+            value.n = 1;
+            value.cell[0] = CELL_PTR(d + 1, s);
+            break;
+        }
+        return value;
     default:
         return value;
     }
