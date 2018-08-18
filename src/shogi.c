@@ -265,7 +265,7 @@ struct cells cells_from(const struct move* move, enum cell* cells) {
     unsigned c = move->suji;
     unsigned n;
 
-#define CELL_PTR(col, row) (cells + row * 9 + col)
+#define CELL_PTR(col, row) (cells + (row) * 9 + (col))
 #define MIN(a, b) (a <= b ? a : b)
 
     switch (move->act) {
@@ -585,12 +585,34 @@ int main() {
     puts(str);
     free(str);
 
-    b.cell[18] = CELL_BLANK;
-    b.cell[27] = CELL_W_FU;
+    /* black */
+    {
+        struct move move = { SUJI_7, DAN_4, K_FU, A_AGARU };
+        (void) move_matching(&move, &b);
+        str = board_tostring(&b);
+        puts(str);
+        free(str);
+    }
+
+    /* white */
     b = board_invert(&b);
-    str = board_tostring(&b);
-    puts(str);
-    free(str);
+    {
+        struct move move = { SUJI_7, DAN_4, K_FU, A_AGARU };
+        (void) move_matching(&move, &b);
+        str = board_tostring(&b);
+        puts(str);
+        free(str);
+    }
+
+    /* black */
+    b = board_invert(&b);
+    {
+        struct move move = { SUJI_2, DAN_8, K_KAKU, A_HIDARI_NARU };
+        (void) move_matching(&move, &b);
+        str = board_tostring(&b);
+        puts(str);
+        free(str);
+    }
 
     return 0;
 }
