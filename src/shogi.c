@@ -273,13 +273,51 @@ struct cells cells_from(const struct move* move, enum cell* cells) {
         case K_KYOU:
         case K_HISHA:
         case K_RYU:
-            while (d--) {
+            while (d-- != 0) {
                 value.cell[value.n++] = CELL_PTR(d, s);
             }
             break;
         default:
             value.n = 1;
             value.cell[0] = CELL_PTR(d - 1, s);
+            break;
+        }
+        return value;
+    case A_MIGI: /* origin exists relatively right hand. */
+    case A_MIGI_NARU:
+        switch (move->koma) {
+        case K_KAKU:
+        case K_UMA:
+            while (d-- != 0 && s-- != 0) {
+                value.cell[value.n++] = CELL_PTR(d, s);
+            }
+            break;
+        case K_KEI:
+            value.n = 1;
+            value.cell[0] = CELL_PTR(d - 2, s - 1);
+            break;
+        default:
+            value.n  = 1;
+            value.cell[0] = CELL_PTR(d - 1, s - 1);
+            break;
+        }
+        return value;
+    case A_HIDARI: /* origin exists relatively left hand. */
+    case A_HIDARI_NARU:
+        switch (move->koma) {
+        case K_KAKU:
+        case K_UMA:
+            while (d-- != 0 && s++ != 8) {
+                value.cell[value.n++] = CELL_PTR(d, s);
+            }
+            break;
+        case K_KEI:
+            value.n = 1;
+            value.cell[0] = CELL_PTR(d - 2, s + 1);
+            break;
+        default:
+            value.n  = 1;
+            value.cell[0] = CELL_PTR(d - 1, s + 1);
             break;
         }
         return value;
