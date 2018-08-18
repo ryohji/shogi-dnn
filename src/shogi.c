@@ -152,7 +152,7 @@ static int compar_captured(const void *a, const void *b) {
 }
 
 enum cell* cell_targeted(struct board* board, const struct move* move) {
-    return board->cell + (8 - move->dan) * 9 + move->suji;
+    return board->cell + (8 - move->dan) * 9 + (8 - move->suji);
 }
 
 int captured_update(struct board* board, enum captured target, enum captured update) {
