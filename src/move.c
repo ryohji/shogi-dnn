@@ -513,7 +513,7 @@ static unsigned remove_improper_promotion(const void *elem, void *context) {
             return 0; /* DONT CARE */
         }
     case K_KAKU:
-        switch (move.dan) {
+        switch (move.act) {
         case A_MIGI_NARU:
             switch (move.dan) {
             case DAN_9: case DAN_8: case DAN_7:
@@ -598,43 +598,66 @@ static unsigned remove_forbidden_move(const void *elem, void *context) {
     switch (move.koma) {
     case K_FU:
     case K_KYOU:
-        return move.act != A_AGARU && move.act != A_NARU
-        && move.act != A_UTSU;
+        switch (move.act) {
+        case A_AGARU:
+        case A_NARU:
+        case A_UTSU:
+            return 0;
+        default:
+            return !0;
+        }
     case K_KEI:
-        return move.act != A_MIGI && move.act != A_MIGI_NARU
-        && move.act != A_HIDARI && move.act != A_HIDARI_NARU
-        && move.act != A_UTSU;
+        switch (move.act) {
+        case A_MIGI: case A_HIDARI:
+        case A_MIGI_NARU: case A_HIDARI_NARU:
+        case A_UTSU:
+            return 0;
+        default:
+            return !0;
+        }
     case K_GIN:
-        return move.act != A_AGARU && move.act != A_NARU
-        && move.act != A_MIGI && move.act != A_MIGI_NARU
-        && move.act != A_HIDARI && move.act != A_HIDARI_NARU
-        && move.act != A_MIGI_HIKU && move.act != A_MIGI_HIKI_NARU
-        && move.act != A_HIDARI_HIKU && move.act != A_HIDARI_HIKI_NARU
-        && move.act != A_UTSU;
+        switch (move.act) {
+        case A_AGARU: case A_MIGI: case A_HIDARI: case A_MIGI_HIKU: case A_HIDARI_HIKU:
+        case A_NARU: case A_MIGI_NARU: case A_HIDARI_NARU: case A_MIGI_HIKI_NARU: case A_HIDARI_HIKI_NARU:
+        case A_UTSU:
+            return 0;
+        default:
+            return !0;
+        }
     case K_KIN:
+        switch (move.act) {
+        case A_AGARU: case A_MIGI: case A_HIDARI: case A_MIGI_YORU: case A_HIDARI_YORU: case A_HIKU:
+        case A_UTSU:
+            return 0;
+        default:
+            return !0;
+        }
     case K_TO:
     case K_NARIKYOU:
     case K_NARIKEI:
     case K_NARIGIN:
-        return move.act != A_AGARU
-        && move.act != A_MIGI
-        && move.act != A_HIDARI
-        && move.act != A_MIGI_YORU
-        && move.act != A_HIDARI_YORU
-        && move.act != A_HIKU
-        && (move.koma != K_KIN || move.act != A_UTSU);
+        switch (move.act) {
+        case A_AGARU: case A_MIGI: case A_HIDARI: case A_MIGI_YORU: case A_HIDARI_YORU: case A_HIKU:
+            return 0;
+        default:
+            return !0;
+        }
     case K_KAKU:
-        return move.act != A_MIGI && move.act != A_MIGI_NARU
-        && move.act != A_HIDARI && move.act != A_HIDARI_NARU
-        && move.act != A_MIGI_HIKU && move.act != A_MIGI_HIKI_NARU
-        && move.act != A_HIDARI_HIKU && move.act != A_HIDARI_HIKI_NARU
-        && move.act != A_UTSU;
+        switch (move.act) {
+        case A_MIGI: case A_HIDARI: case A_MIGI_HIKU: case A_HIDARI_HIKU:
+        case A_UTSU:
+            return 0;
+        default:
+            return !0;
+        }
     case K_HISHA:
-        return move.act != A_AGARU && move.act != A_NARU
-        && move.act != A_MIGI_YORU && move.act != A_MIGI_YORI_NARU
-        && move.act != A_HIDARI_YORU && move.act != A_HIDARI_YORI_NARU
-        && move.act != A_HIKU && move.act != A_HIKI_NARU
-        && move.act != A_UTSU;
+        switch (move.act) {
+        case A_AGARU: case A_MIGI_YORU: case A_HIDARI_YORU: case A_HIKU:
+        case A_UTSU:
+            return 0;
+        default:
+            return !0;
+        }
     case K_UMA:
     case K_RYU:
     case K_GYOKU:
@@ -703,11 +726,13 @@ int main() {
 
     /* # of all_moves (filtered) equals to NUMBER_OF_MOVES */
     if (end - all_moves != NUMBER_OF_MOVES) {
+        fprintf(stderr, "Number of moves are mismatch. (%d v.s. %ld)\n", NUMBER_OF_MOVES, end - all_moves);
         return 1;
     }
 
     /* all_moves (filtered) and _allowed_moves has just same elements. */
     if (memcmp(all_moves, _allowed_moves, sizeof(_allowed_moves))) {
+        fprintf(stderr, "Elements in moves are mismatch.\n");
         return 1;
     }
 
