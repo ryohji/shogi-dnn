@@ -64,7 +64,7 @@ enum dan {
     DAN_1,
 };
 
-#define NUMBER_OF_MOVES 5703
+#define NUMBER_OF_MOVES 5530
 
 /**
  * SUJI                     DAN
