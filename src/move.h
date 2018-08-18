@@ -40,16 +40,50 @@ enum act {
     A_UTSU, /* put piece from hand */
 };
 
-#define NUMBER_OF_COLUMNS 9
-#define NUMBER_OF_ROWS 9
+enum suji {
+    SUJI_9,
+    SUJI_8,
+    SUJI_7,
+    SUJI_6,
+    SUJI_5,
+    SUJI_4,
+    SUJI_3,
+    SUJI_2,
+    SUJI_1,
+};
+
+enum dan {
+    DAN_9,
+    DAN_8,
+    DAN_7,
+    DAN_6,
+    DAN_5,
+    DAN_4,
+    DAN_3,
+    DAN_2,
+    DAN_1,
+};
 
 #define NUMBER_OF_MOVES 5703
 
+/**
+ * SUJI                     DAN
+ * 9  8  7  6  5  4  3  2  1
+ *                           9
+ *                           8
+ *                           7
+ *                           6
+ *                           5
+ *          * <== 64         4
+ *              SUJI-DAN     3
+ *                           2
+ *                           1
+ */
 struct move {
-  int dan;
-  int suji;
-  enum koma koma;
-  enum act act;
+    enum suji suji;
+    enum dan dan;
+    enum koma koma;
+    enum act act;
 };
 
 struct move move_describe(unsigned code);

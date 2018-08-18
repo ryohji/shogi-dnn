@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define NUMBER_OF_COLUMNS 9
+#define NUMBER_OF_ROWS 9
+
 static const uint16_t _allowed_moves[] = {
         1,    17,    18,    33,    34,    35,    50,    51,    67,    68,    84,    85,   101,   102,   118,   119,
       135,   152,   154,   170,   171,   186,   187,   188,   203,   204,   220,   221,   237,   238,   254,   255,
