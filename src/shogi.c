@@ -236,9 +236,59 @@ int move_matching(const struct move* move, struct board* board) {
     }
 }
 
+struct cells {
+    unsigned n;
+    enum cell* cell[8];
+};
+
+/**
+ * Choose cell pointers thet possibly the origin of move.
+ */
+static struct cells cells_from(const struct move* move, enum cell* cells);
+
 enum cell* koma_origin(const struct move* move, enum cell* board) {
+    const struct cells cells = cells_from(move, board);
+    unsigned n = 0;
+    while (n < cells.n && *cells.cell[n] == CELL_BLANK) { /* Skip blank cells */
+        n += 1;
+    }
+    if (n == cells.n || *cells.cell[n] != koma_to_cell(move->koma)) {
+        return board + NUMBER_OF_CELLS; /* NOT FOUND; all trails filled with blank, or first found koma does not match. */
+    } else {
+        return cells.cell[n]; /* TA-DA! */
+    }
+}
+
+struct cells cells_from(const struct move* move, enum cell* cells) {
+    struct cells value = {0};
+    unsigned d = move->dan;
+    unsigned s = move->suji;
+
+#define CELL_PTR(dan, suji) (cells + (8 - dan) * 9 + (8 - suji))
+
+    switch (move->act) {
+    case A_AGARU:
+    case A_NARU:
+        switch (move->koma) {
+        case K_KYOU:
+        case K_HISHA:
+        case K_RYU:
+            while (d--) {
+                value.cell[value.n++] = CELL_PTR(d, s);
+            }
+            break;
+        default:
+            value.n = 1;
+            value.cell[0] = CELL_PTR(d - 1, s);
+            break;
+        }
+        return value;
     /* TODO */
-    return board + NUMBER_OF_CELLS;
+    default:
+        return value;
+    }
+
+#undef CELL_PTR
 }
 
 static int promoting(enum act act);
