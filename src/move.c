@@ -431,11 +431,166 @@ static const char* _str_move(unsigned move) {
 
 static unsigned remove_improper_promotion(const void *elem, void *context) {
     const struct move move = move_describe(*(uint16_t *)elem);
-    return (move.dan > 2 || move.koma == K_TO || move.koma == K_NARIKYOU || move.koma == K_NARIKEI
-    || move.koma == K_NARIGIN || move.koma == K_UMA || move.koma == K_RYU || move.koma == K_GYOKU)
-    && (move.act == A_NARU || move.act == A_MIGI_NARU || move.act == A_HIDARI_NARU
-    || move.act == A_MIGI_YORI_NARU || move.act == A_HIDARI_YORI_NARU
-    || move.act == A_MIGI_HIKI_NARU || move.act == A_HIDARI_HIKI_NARU || move.act == A_HIKI_NARU);
+    switch (move.koma) {
+    case K_FU:
+    case K_KYOU:
+        switch (move.act) {
+        case A_NARU:
+            switch (move.dan) {
+            case DAN_9: case DAN_8: case DAN_7:
+                return 0; /* OK */
+            default:
+                return !0; /* Out of promotion area. */
+            }
+        case A_MIGI_NARU: case A_HIDARI_NARU: case A_MIGI_YORI_NARU: case A_HIDARI_YORI_NARU:
+        case A_MIGI_HIKI_NARU: case A_HIDARI_HIKI_NARU: case A_HIKI_NARU:
+            return !0; /* Invalid move. */
+        default:
+            return 0; /* DONT CARE */
+        }
+    case K_KEI:
+        switch (move.act) {
+        case A_MIGI_NARU:
+            switch (move.dan) {
+            case DAN_9: case DAN_8: case DAN_7:
+                return move.suji == SUJI_1; /* OK; SUJI 1 is right most, so Keima can't be moved in. */
+            default:
+                return !0; /* Out of promotion area. */
+            }
+        case A_HIDARI_NARU:
+            switch (move.dan) {
+            case DAN_9: case DAN_8: case DAN_7:
+                return move.suji == SUJI_9; /* OK; SUJI 9 is left most, so Keima can't be moved in. */
+            default:
+                return !0; /* Out of promotion area. */
+            }
+        case A_NARU: case A_MIGI_YORI_NARU: case A_HIDARI_YORI_NARU:
+        case A_MIGI_HIKI_NARU: case A_HIDARI_HIKI_NARU: case A_HIKI_NARU:
+            return !0; /* Invalid move. */
+        default:
+            return 0; /* DONT CARE */
+        }
+    case K_GIN:
+        switch (move.act) {
+        case A_NARU:
+            switch (move.dan) {
+            case DAN_9: case DAN_8: case DAN_7:
+                return 0; /* OK */
+            default:
+                return !0; /* Out of promotion area. */
+            }
+        case A_MIGI_NARU:
+            switch (move.dan) {
+            case DAN_9: case DAN_8: case DAN_7:
+                return move.suji == SUJI_1; /* OK; SUJI 1 is right most, so Keima can't be moved in. */
+            default:
+                return !0; /* Out of promotion area. */
+            }
+        case A_HIDARI_NARU:
+            switch (move.dan) {
+            case DAN_9: case DAN_8: case DAN_7:
+                return move.suji == SUJI_9; /* OK; SUJI 9 is left most, so Keima can't be moved in. */
+            default:
+                return !0; /* Out of promotion area. */
+            }
+        case A_MIGI_HIKI_NARU:
+            switch (move.dan) {
+            case DAN_8: case DAN_7:
+                return move.suji == SUJI_1;
+            default:
+                return !0; /* Can not be backed in DAN 9. DAN between 6 to 1 are out of promotion area. */
+            }
+        case A_HIDARI_HIKI_NARU:
+            switch (move.dan) {
+            case DAN_8: case DAN_7:
+                return move.suji == SUJI_9;
+            default:
+                return !0;
+            }
+        case A_MIGI_YORI_NARU: case A_HIDARI_YORI_NARU: case A_HIKI_NARU:
+            return !0; /* Invalid move. */
+        default:
+            return 0; /* DONT CARE */
+        }
+    case K_KAKU:
+        switch (move.dan) {
+        case A_MIGI_NARU:
+            switch (move.dan) {
+            case DAN_9: case DAN_8: case DAN_7:
+                return move.suji == SUJI_1; /* OK; SUJI 1 is right most, so Keima can't be moved in. */
+            default:
+                return !0; /* Out of promotion area. */
+            }
+        case A_HIDARI_NARU:
+            switch (move.dan) {
+            case DAN_9: case DAN_8: case DAN_7:
+                return move.suji == SUJI_9; /* OK; SUJI 9 is left most, so Keima can't be moved in. */
+            default:
+                return !0; /* Out of promotion area. */
+            }
+        case A_MIGI_HIKI_NARU:
+            switch (move.dan) {
+            case DAN_8: case DAN_7:
+                return move.suji == SUJI_1;
+            default:
+                return !0; /* Can not be backed in DAN 9. DAN between 6 to 1 are out of promotion area. */
+            }
+        case A_HIDARI_HIKI_NARU:
+            switch (move.dan) {
+            case DAN_8: case DAN_7:
+                return move.suji == SUJI_9;
+            default:
+                return !0;
+            }
+        case A_NARU: case A_MIGI_YORI_NARU: case A_HIDARI_YORI_NARU: case A_HIKI_NARU:
+            return !0; /* Invalid move. */
+        default:
+            return 0; /* DONT CARE */
+        }
+    case K_HISHA:
+        switch (move.act) {
+        case A_NARU:
+            switch (move.dan) {
+            case DAN_9: case DAN_8: case DAN_7:
+                return 0; /* OK */
+            default:
+                return !0; /* Out of promotion area. */
+            }
+        case A_MIGI_YORI_NARU:
+            switch (move.dan) {
+            case DAN_9: case DAN_8: case DAN_7:
+                return move.suji == SUJI_1; /* OK */
+            default:
+                return !0; /* Out of promotion area. */
+            }
+        case A_HIDARI_YORI_NARU:
+            switch (move.dan) {
+            case DAN_9: case DAN_8: case DAN_7:
+                return move.suji == SUJI_9; /* OK */
+            default:
+                return !0; /* Out of promotion area. */
+            }
+        case A_HIKI_NARU:
+            switch (move.dan) {
+            case DAN_8: case DAN_7:
+                return 0; /* OK */
+            default:
+                return !0;
+            }
+        case A_MIGI_NARU: case A_HIDARI_NARU: case A_MIGI_HIKI_NARU: case A_HIDARI_HIKI_NARU:
+            return !0; /* NG */
+        default:
+            return 0; /* DONT CARE */
+        }
+    default:
+        switch (move.act) {
+        case A_NARU: case A_MIGI_NARU: case A_HIDARI_NARU: case A_MIGI_YORI_NARU: case A_HIDARI_YORI_NARU:
+        case A_MIGI_HIKI_NARU: case A_HIDARI_HIKI_NARU: case A_HIKI_NARU:
+            return !0; /* Forbidden promotion. */
+        default:
+            return 0; /* DONT CARE */
+        }
+    }
 }
 
 static unsigned remove_forbidden_move(const void *elem, void *context) {
