@@ -388,44 +388,44 @@ struct move move_describe(unsigned code) {
 
 static const char* _str_koma(unsigned koma) {
     switch (koma) {
-    case 0: return "FU";
-    case 1: return "TO";
-    case 2: return "KYOU";
-    case 3: return "NARIKYOU";
-    case 4: return "KEI";
-    case 5: return "NARIKEI";
-    case 6: return "GIN";
-    case 7: return "NARIGIN";
-    case 8: return "KIN";
-    case 9: return "KAKU";
-    case 10: return "UMA";
-    case 11: return "HISHA";
-    case 12: return "RYU";
-    case 13: return "GYOKU";
-    default: return "";
+    case K_FU: return "歩";
+    case K_TO: return "と";
+    case K_KYOU: return "香";
+    case K_NARIKYOU: return "杏";
+    case K_KEI: return "桂";
+    case K_NARIKEI: return "圭";
+    case K_GIN: return "銀";
+    case K_NARIGIN: return "全";
+    case K_KIN: return "金";
+    case K_KAKU: return "角";
+    case K_UMA: return "馬";
+    case K_HISHA: return "飛";
+    case K_RYU: return "竜";
+    case K_GYOKU: return "玉";
+    default: fprintf(stderr, "Invalid koma: %d\n", koma); return "";
     }
 }
 
 static const char* _str_move(unsigned move) {
     switch (move) {
-    case 0: return "AGARU";
-    case 1: return "NARU";
-    case 2: return "MIGI";
-    case 3: return "MIGI_NARU";
-    case 4: return "HIDARI";
-    case 5: return "HIDARI_NARU";
-    case 6: return "MIGI_YORU";
-    case 7: return "MIGI_YORI_NARU";
-    case 8: return "HIDARI_YORU";
-    case 9: return "HIDARI_YORI_NARU";
-    case 10: return "MIGI_HIKU";
-    case 11: return "MIGI_HIKI_NARU";
-    case 12: return "HIDARI_HIKU";
-    case 13: return "HIDARI_HIKI_NARU";
-    case 14: return "HIKU";
-    case 15: return "HIKI_NARU";
-    case 16: return "UTSU";
-    default: return "";
+    case A_AGARU: return "";
+    case A_NARU: return "成";
+    case A_MIGI: return "右";
+    case A_MIGI_NARU: return "右成";
+    case A_HIDARI: return "左";
+    case A_HIDARI_NARU: return "左成";
+    case A_MIGI_YORU: return "寄右";
+    case A_MIGI_YORI_NARU: return "寄右成";
+    case A_HIDARI_YORU: return "寄左";
+    case A_HIDARI_YORI_NARU: return "寄左成";
+    case A_MIGI_HIKU: return "引右";
+    case A_MIGI_HIKI_NARU: return "引右成";
+    case A_HIDARI_HIKU: return "引左";
+    case A_HIDARI_HIKI_NARU: return "引左成";
+    case A_HIKU: return "引";
+    case A_HIKI_NARU: return "引成";
+    case A_UTSU: return "打";
+    default: fprintf(stderr, "Invalid act: %d\n", move); return "";
     }
 }
 
@@ -756,9 +756,7 @@ int main() {
     for (it = all_moves; it != end; ++it) {
         const intptr_t i = it - all_moves;
         struct move move = move_describe(*it);
-
-        printf("%d%d%s%s%s,\n", 9 - move.suji, 9 - move.dan, _str_koma(move.koma),
-        move.act ? "_" : "", move.act ? _str_move(move.act) : "");
+        printf("%d%d%s%s\n", 9 - move.suji, 9 - move.dan, _str_koma(move.koma), _str_move(move.act));
     }
 
     /* # of allowed_moves equals to NUMBER_OF_MOVES */
