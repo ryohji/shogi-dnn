@@ -668,25 +668,58 @@ static unsigned remove_forbidden_move(const void *elem, void *context) {
 static unsigned remove_enter_outside(const void *elem, void *context) {
     const struct move move = move_describe(*(uint16_t *)elem);
     unsigned result = 0;
-    if (move.dan == 0) {
-        result |= move.act == A_MIGI_HIKU || move.act == A_MIGI_HIKI_NARU
-        || move.act == A_HIDARI_HIKU || move.act == A_HIDARI_HIKI_NARU
-        || move.act == A_HIKU || move.act == A_HIKI_NARU;
-    } else if (move.dan == 8) {
-        result |= move.act == A_AGARU || move.act == A_NARU
-        || move.act == A_MIGI || move.act == A_MIGI_NARU
-        || move.act == A_HIDARI || move.act == A_HIDARI_NARU;
-    } else if (move.dan == 7 && move.koma == K_KEI) {
-        result |= move.act == A_HIDARI || move.act == A_MIGI;
+    switch (move.dan) {
+    case DAN_9:
+        switch (move.act) {
+        case A_MIGI_HIKU: case A_HIDARI_HIKU: case A_HIKU:
+            result = !0;
+            /* $fall through$ */
+        default:
+            break;
+        }
+        break;
+    case DAN_2:
+        switch (move.act) {
+        case A_MIGI: case A_HIDARI:
+            result = move.koma == K_KEI;
+            /* $fall through$ */
+        default:
+            break;
+        }
+        break;
+    case DAN_1:
+        switch (move.act) {
+        case A_AGARU: case A_MIGI: case A_HIDARI:
+            result = !0;
+            /* $fall through$ */
+        default:
+            break;
+        }
+        /* $fall through$ */
+    default:
+        break;
     }
-    if (move.suji == 0) {
-        result |= move.act == A_MIGI || move.act == A_MIGI_NARU
-        || move.act == A_MIGI_YORU || move.act == A_MIGI_YORI_NARU
-        || move.act == A_MIGI_HIKU || move.act == A_MIGI_HIKI_NARU;
-    } else if (move.suji == 8) {
-        result |= move.act == A_HIDARI || move.act == A_HIDARI_NARU
-        || move.act == A_HIDARI_YORU || move.act == A_HIDARI_YORI_NARU
-        || move.act == A_HIDARI_HIKU || move.act == A_HIDARI_HIKI_NARU;
+    switch (move.suji) {
+    case SUJI_9:
+        switch (move.act) {
+        case A_HIDARI: case A_HIDARI_YORU: case A_HIDARI_HIKU:
+            result |= !0;
+            /* $fall through$ */
+        default:
+            break;
+        }
+        break;
+    case SUJI_1:
+        switch (move.act) {
+        case A_MIGI: case A_MIGI_YORU: case A_MIGI_HIKU:
+            result |= !0;
+            /* $fall through$ */
+        default:
+            break;
+        }
+        /* $fall through$ */
+    default:
+        break;
     }
     return result;
 }
@@ -696,9 +729,9 @@ static unsigned remove_enables_no_more_move(const void *elem, void *context) {
     switch (move.koma) {
     case K_FU:
     case K_KYOU:
-        return move.dan == 0 && (move.act == A_AGARU || move.act == A_UTSU);
+        return move.dan == DAN_9 && (move.act == A_AGARU || move.act == A_UTSU);
     case K_KEI:
-        return (move.dan == 0 || move.dan == 1) && (move.act == A_MIGI || move.act == A_HIDARI || move.act == A_UTSU);
+        return (move.dan == DAN_9 || move.dan == DAN_8) && (move.act == A_MIGI || move.act == A_HIDARI || move.act == A_UTSU);
     default:
         return 0;
     }
@@ -719,6 +752,15 @@ int main() {
     end = filter(all_moves, end, sizeof(uint16_t), remove_enter_outside, NULL, all_moves);
     end = filter(all_moves, end, sizeof(uint16_t), remove_enables_no_more_move, NULL, all_moves);
 
+    /* dump result */
+    for (it = all_moves; it != end; ++it) {
+        const intptr_t i = it - all_moves;
+        struct move move = move_describe(*it);
+
+        printf("%d%d%s%s%s,\n", 9 - move.suji, 9 - move.dan, _str_koma(move.koma),
+        move.act ? "_" : "", move.act ? _str_move(move.act) : "");
+    }
+
     /* # of allowed_moves equals to NUMBER_OF_MOVES */
     if (sizeof(_allowed_moves)/sizeof(_allowed_moves[0]) != NUMBER_OF_MOVES) {
         return 1;
@@ -736,14 +778,6 @@ int main() {
         return 1;
     }
 
-    /* dump result */
-    for (it = all_moves; it != end; ++it) {
-        const intptr_t i = it - all_moves;
-        struct move move = move_describe(*it);
-
-        printf("  MOVE_%d%d%s%s%s,\n", move.suji + 1, move.dan + 1, _str_koma(move.koma),
-        move.act ? "_" : "", move.act ? _str_move(move.act) : "");
-    }
     free(all_moves);
 /*
     {
